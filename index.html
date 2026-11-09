@@ -1,20 +1,25 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <title>StudySpace | Life Dashboard</title>
+    <title>StudySpace | Student Dashboard</title>
 
     <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
     <!-- Navigation Bar -->
-    <header>
-        <h2>StudySpace</h2>
+
+    <header class="navbar">
+
+        <h2 class="logo">StudySpace 🌙</h2>
 
         <nav>
             <a href="#home">Home</a>
@@ -22,41 +27,155 @@
             <a href="#timer">Study Timer</a>
             <a href="#exam">Exam Countdown</a>
         </nav>
+
     </header>
 
+
     <!-- Main Dashboard -->
-    <main id="home">
+
+    <main class="container" id="home">
+
+
+        <!-- Welcome Section -->
 
         <section class="welcome">
-            <h1>Welcome to StudySpace 🌙</h1>
-            <p>Your personal space to plan, focus and achieve.</p>
+
+            <div>
+                <p class="small-heading">YOUR PERSONAL STUDY SPACE</p>
+
+                <h1>Welcome Back, Student! 👋</h1>
+
+                <p>Plan your day, stay focused and achieve your goals.</p>
+            </div>
+
         </section>
+
+
+        <!-- Statistics Section -->
+
+        <section class="stats">
+
+            <div class="stat-card">
+                <h3>📚 Study Time</h3>
+                <p id="totalStudy">0 min</p>
+                <span>Total study time today</span>
+            </div>
+
+            <div class="stat-card">
+                <h3>🎯 Goals Completed</h3>
+                <p id="completedGoals">0</p>
+                <span>Tasks completed today</span>
+            </div>
+
+            <div class="stat-card">
+                <h3>🔥 Focus Sessions</h3>
+                <p id="sessions">0</p>
+                <span>Pomodoro sessions completed</span>
+            </div>
+
+        </section>
+
 
         <!-- Daily Goals -->
-        <section id="goals" class="card">
-            <h2>Daily Goals</h2>
-            <p>Organise your tasks and complete your goals.</p>
+
+        <section class="card" id="goals">
+
+            <h2>🎯 Daily Goals</h2>
+
+            <p>Make a plan and complete your daily tasks.</p>
+
+            <div class="goal-input">
+
+                <input
+                    type="text"
+                    id="goalInput"
+                    placeholder="Enter your study goal..."
+                >
+
+                <button id="addGoal">Add Goal +</button>
+
+            </div>
+
+            <ul id="goalList"></ul>
+
         </section>
+
 
         <!-- Study Timer -->
-        <section id="timer" class="card">
-            <h2>Study Timer</h2>
-            <p>Stay focused and make every minute count.</p>
+
+        <section class="card timer-card" id="timer">
+
+            <h2>⏱ Study Timer</h2>
+
+            <p>Focus on your studies, one session at a time.</p>
+
+            <div class="timer-display" id="timerDisplay">
+                25:00
+            </div>
+
+            <div class="timer-buttons">
+
+                <button id="startTimer">Start</button>
+
+                <button id="pauseTimer">Pause</button>
+
+                <button id="resetTimer">Reset</button>
+
+            </div>
+
+            <p class="timer-note">
+                25 minutes study • 5 minutes break
+            </p>
+
         </section>
 
+
         <!-- Exam Countdown -->
-        <section id="exam" class="card">
-            <h2>Exam Countdown</h2>
-            <p>Keep track of your upcoming examinations.</p>
+
+        <section class="card" id="exam">
+
+            <h2>📅 Exam Countdown</h2>
+
+            <p>Never lose track of your upcoming examinations.</p>
+
+            <input
+                type="text"
+                id="examName"
+                placeholder="Enter exam name..."
+            >
+
+            <input
+                type="date"
+                id="examDate"
+            >
+
+            <button id="saveExam">Save Exam</button>
+
+            <div id="examResult">
+                No upcoming exam added yet.
+            </div>
+
         </section>
+
 
     </main>
 
+
+    <!-- Footer -->
+
     <footer>
-        <p>StudySpace | Small Steps. Steady Focus. Better Progress.</p>
+
+        <h3>StudySpace 🌙</h3>
+
+        <p>Small Steps. Steady Focus. Better Progress.</p>
+
+        <p>Made for students, with ❤️</p>
+
     </footer>
+
 
     <script src="script.js"></script>
 
 </body>
+
 </html>
