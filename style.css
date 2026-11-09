@@ -3,130 +3,349 @@
    STUDYSPACE - MAIN DESIGN
 ================================= */
 
-/* Basic Settings */
-
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #101A3A, #20164A, #45318E);
-    color: white;
-    min-height: 100vh;
+html {
+    scroll-behavior: smooth;
 }
 
-/* Navigation Bar */
+body {
+    font-family: Arial, sans-serif;
+    color: #ffffff;
+    min-height: 100vh;
 
-header {
+    background:
+        radial-gradient(circle at top left, #343477, transparent 40%),
+        radial-gradient(circle at bottom right, #47236e, transparent 45%),
+        #101329;
+
+    overflow-x: hidden;
+}
+
+/* NAVIGATION BAR */
+
+.navbar {
+    width: 100%;
+    padding: 22px 7%;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 22px 7%;
-    background: rgba(10, 15, 40, 0.75);
-    border-bottom: 1px solid rgba(255,255,255,0.12);
+
+    background: rgba(10, 12, 35, 0.85);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(15px);
 }
 
-header h2 {
-    color: #EEE9FF;
+.logo {
     font-size: 27px;
+    color: #d9c7ff;
     letter-spacing: 1px;
 }
 
 nav {
     display: flex;
-    gap: 25px;
+    gap: 30px;
 }
 
 nav a {
-    color: #DDD6FF;
+    color: #e0dcff;
     text-decoration: none;
     font-size: 15px;
     transition: 0.3s;
 }
 
 nav a:hover {
-    color: #B69AFF;
+    color: #b99aff;
 }
 
-/* Main Dashboard */
+/* MAIN CONTAINER */
 
-main {
+.container {
     width: 86%;
-    max-width: 1200px;
+    max-width: 1250px;
     margin: 45px auto;
 }
 
-/* Welcome Section */
+/* WELCOME SECTION */
 
 .welcome {
-    margin-bottom: 35px;
-    padding: 35px;
+    padding: 55px 45px;
+    border-radius: 25px;
+
     background: linear-gradient(
         120deg,
-        rgba(118,87,214,0.35),
-        rgba(53,184,176,0.12)
+        rgba(105, 86, 190, 0.35),
+        rgba(61, 49, 120, 0.35)
     );
+
     border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 20px;
+
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+
+    animation: fadeIn 1s ease;
+}
+
+.small-heading {
+    color: #c6aaff;
+    font-size: 12px;
+    letter-spacing: 3px;
+    margin-bottom: 15px;
 }
 
 .welcome h1 {
-    font-size: 32px;
-    margin-bottom: 12px;
-    color: #EEE9FF;
+    font-size: 38px;
+    margin-bottom: 15px;
 }
 
 .welcome p {
-    color: #D0C9EF;
-    font-size: 16px;
+    color: #d0cde9;
+    line-height: 1.7;
 }
 
-/* Dashboard Cards */
+/* STATISTICS CARDS */
 
-.card {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.14);
-    border-radius: 18px;
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    margin: 35px 0;
+}
+
+.stat-card {
     padding: 28px;
-    margin-bottom: 22px;
-    transition: 0.3s;
+    border-radius: 20px;
+
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+
     backdrop-filter: blur(12px);
+    transition: 0.3s;
 }
 
-.card:hover {
-    transform: translateY(-4px);
+.stat-card:hover {
+    transform: translateY(-6px);
     background: rgba(255,255,255,0.12);
 }
 
-.card h2 {
-    color: #C8B6FF;
-    margin-bottom: 12px;
-    font-size: 23px;
+.stat-card h3 {
+    font-size: 17px;
+    margin-bottom: 18px;
+    color: #d9c5ff;
 }
 
-.card p {
-    color: #D0D0E5;
+.stat-card p {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.stat-card span {
+    font-size: 13px;
+    color: #bcb8d6;
+}
+
+/* GENERAL CARDS */
+
+.card {
+    padding: 35px;
+    margin: 25px 0;
+
+    border-radius: 22px;
+
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.13);
+
+    backdrop-filter: blur(15px);
+
+    transition: 0.3s;
+}
+
+.card:hover {
+    border-color: rgba(186,155,255,0.5);
+}
+
+.card h2 {
+    color: #d6bdff;
+    font-size: 25px;
+    margin-bottom: 15px;
+}
+
+.card > p {
+    color: #c8c4df;
+    margin-bottom: 25px;
     line-height: 1.6;
 }
 
-/* Footer */
+/* INPUT FIELDS */
+
+input {
+    padding: 14px;
+    border-radius: 10px;
+
+    border: 1px solid rgba(255,255,255,0.2);
+
+    background: rgba(10,12,35,0.6);
+
+    color: white;
+    font-size: 15px;
+    outline: none;
+    margin: 8px 5px 8px 0;
+    max-width: 100%;
+}
+
+input::placeholder {
+    color: #aaa5c8;
+}
+
+input:focus {
+    border-color: #b99aff;
+}
+
+/* BUTTONS */
+
+button {
+    padding: 13px 22px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: linear-gradient(135deg, #8060d9, #a77ce9);
+
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(140,100,230,0.4);
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+/* DAILY GOALS */
+
+.goal-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.goal-input input {
+    flex: 1;
+    min-width: 200px;
+}
+
+#goalList {
+    list-style: none;
+}
+
+#goalList li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 15px;
+    margin: 10px 0;
+
+    border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+}
+
+/* STUDY TIMER */
+
+.timer-card {
+    text-align: center;
+}
+
+.timer-display {
+    font-size: 75px;
+    font-weight: bold;
+    color: #d5baff;
+
+    margin: 35px 0;
+    letter-spacing: 5px;
+}
+
+.timer-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.timer-note {
+    font-size: 13px;
+    color: #aaa5c8;
+    margin-top: 22px;
+}
+
+/* EXAM COUNTDOWN */
+
+#examResult {
+    margin-top: 25px;
+    padding: 20px;
+
+    background: rgba(255,255,255,0.06);
+    border-radius: 12px;
+
+    color: #d6bdff;
+    font-size: 18px;
+}
+
+/* FOOTER */
 
 footer {
     text-align: center;
-    padding: 25px;
-    margin-top: 50px;
-    color: #BDB5DC;
+    padding: 35px 15px;
+
+    background: rgba(10,12,35,0.7);
     border-top: 1px solid rgba(255,255,255,0.1);
+
+    color: #aaa5c8;
+    line-height: 2;
 }
 
-/* Mobile Responsive Design */
+footer h3 {
+    color: #d6bdff;
+    font-size: 23px;
+}
+
+/* ANIMATIONS */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* MOBILE RESPONSIVE DESIGN */
 
 @media (max-width: 768px) {
 
-    header {
+    .navbar {
         flex-direction: column;
         gap: 20px;
     }
@@ -137,20 +356,28 @@ footer {
         gap: 15px;
     }
 
-    main {
+    .container {
         width: 92%;
         margin: 25px auto;
     }
 
     .welcome {
-        padding: 25px;
+        padding: 35px 22px;
     }
 
     .welcome h1 {
-        font-size: 25px;
+        font-size: 28px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
     }
 
     .card {
-        padding: 22px;
+        padding: 25px 18px;
+    }
+
+    .timer-display {
+        font-size: 55px;
     }
 }
