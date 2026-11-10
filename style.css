@@ -1,7 +1,7 @@
 
-/* =================================
-   STUDYSPACE - MAIN DESIGN
-================================= */
+/* =========================================
+   STUDYSPACE - PREMIUM NIGHT THEME
+========================================= */
 
 * {
     margin: 0;
@@ -11,10 +11,46 @@
     scroll-behavior: smooth;
 }
 
+html {
+    scroll-padding-top: 100px;
+}
+
 body {
-    background: linear-gradient(135deg, #100d27, #191638, #241b49);
+    background:
+        radial-gradient(ellipse at 15% 20%, rgba(111, 66, 193, 0.18), transparent 40%),
+        radial-gradient(ellipse at 85% 70%, rgba(75, 65, 180, 0.16), transparent 40%),
+        linear-gradient(135deg, #100d27, #191638, #241b49);
+    background-size: 150% 150%;
+    animation: backgroundMove 18s ease-in-out infinite alternate;
     color: #ffffff;
     min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+@keyframes backgroundMove {
+    0% {
+        background-position: 0% 0%;
+    }
+    100% {
+        background-position: 100% 100%;
+    }
+}
+
+/* SOFT BACKGROUND GLOW */
+
+body::before {
+    content: "";
+    position: fixed;
+    width: 350px;
+    height: 350px;
+    top: 20%;
+    left: -180px;
+    border-radius: 50%;
+    background: rgba(139, 92, 246, 0.12);
+    filter: blur(90px);
+    pointer-events: none;
+    z-index: -1;
 }
 
 /* NAVIGATION BAR */
@@ -24,17 +60,19 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 22px 7%;
-    background: rgba(15, 12, 38, 0.85);
+    background: rgba(15, 12, 38, 0.88);
     border-bottom: 1px solid rgba(255,255,255,0.1);
     position: sticky;
     top: 0;
     z-index: 100;
-    backdrop-filter: blur(15px);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
 }
 
 .logo {
-    font-size: 25px;
+    font-size: 27px;
     color: #d9c5ff;
+    letter-spacing: 0.5px;
 }
 
 .navbar nav {
@@ -46,6 +84,18 @@ body {
     color: #ded8f5;
     text-decoration: none;
     font-size: 15px;
+    transition: 0.3s ease;
+    position: relative;
+}
+
+.navbar nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -7px;
+    width: 0;
+    height: 2px;
+    background: #a78bfa;
     transition: 0.3s;
 }
 
@@ -53,10 +103,14 @@ body {
     color: #b995ff;
 }
 
+.navbar nav a:hover::after {
+    width: 100%;
+}
+
 /* MAIN CONTAINER */
 
 .container {
-    max-width: 1200px;
+    max-width: 1400px;
     width: 90%;
     margin: 40px auto;
 }
@@ -64,33 +118,36 @@ body {
 /* WELCOME SECTION */
 
 .welcome {
-    padding: 45px;
-    border-radius: 25px;
+    padding: 55px;
+    border-radius: 28px;
     background: linear-gradient(
         135deg,
-        rgba(139, 92, 246, 0.25),
+        rgba(139, 92, 246, 0.27),
         rgba(79, 70, 229, 0.12)
     );
-    border: 1px solid rgba(255,255,255,0.12);
-    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.14);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     margin-bottom: 35px;
+    animation: fadeUp 0.8s ease;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.12);
 }
 
 .small-heading {
     color: #c4a8ff;
     font-size: 12px;
     letter-spacing: 3px;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
 }
 
 .welcome h1 {
-    font-size: 36px;
+    font-size: 38px;
     margin-bottom: 15px;
 }
 
 .welcome p {
     color: #c9c4df;
-    line-height: 1.7;
+    line-height: 1.8;
 }
 
 /* STATISTICS CARDS */
@@ -103,34 +160,35 @@ body {
 }
 
 .stat-card {
-    padding: 28px;
-    border-radius: 20px;
+    padding: 30px;
+    border-radius: 22px;
     background: linear-gradient(
         145deg,
         rgba(139, 92, 246, 0.22),
         rgba(255,255,255,0.06)
     );
-    border: 1px solid rgba(255,255,255,0.16);
-    backdrop-filter: blur(12px);
-    transition: 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    transition: 0.35s ease;
 }
 
 .stat-card:hover {
-    transform: translateY(-6px);
-    border-color: rgba(185,149,255,0.5);
-    background: rgba(139,92,246,0.22);
+    transform: translateY(-7px);
+    border-color: rgba(185,149,255,0.6);
+    box-shadow: 0 12px 30px rgba(139,92,246,0.18);
 }
 
 .stat-card h3 {
-    font-size: 17px;
-    margin-bottom: 18px;
+    font-size: 18px;
+    margin-bottom: 20px;
     color: #d9c5ff;
 }
 
 .stat-card p {
-    font-size: 32px;
+    font-size: 34px;
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     color: #ffffff;
 }
 
@@ -142,39 +200,46 @@ body {
 /* COMMON DASHBOARD CARDS */
 
 .card {
-    padding: 32px;
-    border-radius: 22px;
-    background: rgba(255,255,255,0.06);
+    padding: 35px;
+    border-radius: 25px;
+    background: rgba(255,255,255,0.065);
     border: 1px solid rgba(255,255,255,0.12);
-    backdrop-filter: blur(12px);
-    margin-bottom: 28px;
-    transition: 0.3s;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    margin-bottom: 30px;
+    transition: 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.card:hover {
+    border-color: rgba(185,149,255,0.28);
 }
 
 .card h2 {
     color: #d9c5ff;
-    margin-bottom: 15px;
-    font-size: 24px;
+    margin-bottom: 17px;
+    font-size: 26px;
 }
 
 .card > p {
     color: #bcb8d6;
-    margin-bottom: 22px;
-    line-height: 1.6;
+    margin-bottom: 23px;
+    line-height: 1.7;
 }
 
 /* INPUT FIELDS */
 
 input {
-    padding: 13px 16px;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.18);
+    padding: 14px 18px;
+    border-radius: 11px;
+    border: 1px solid rgba(255,255,255,0.17);
     background: rgba(255,255,255,0.08);
     color: white;
     outline: none;
     margin: 8px 5px 8px 0;
     font-size: 14px;
     max-width: 100%;
+    transition: 0.3s ease;
 }
 
 input::placeholder {
@@ -183,6 +248,8 @@ input::placeholder {
 
 input:focus {
     border-color: #a78bfa;
+    box-shadow: 0 0 0 3px rgba(167,139,250,0.13);
+    background: rgba(255,255,255,0.11);
 }
 
 input[type="date"] {
@@ -192,21 +259,26 @@ input[type="date"] {
 /* BUTTONS */
 
 button {
-    padding: 12px 20px;
+    padding: 13px 22px;
     border: none;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #8b5cf6, #6d4aff);
+    border-radius: 11px;
+    background: linear-gradient(135deg, #9565ff, #7045f5);
     color: white;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.3s ease;
     margin: 5px 3px;
 }
 
 button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 5px 18px rgba(139,92,246,0.35);
+    box-shadow: 0 7px 22px rgba(139,92,246,0.4);
+    background: linear-gradient(135deg, #a780ff, #805aff);
+}
+
+button:active {
+    transform: scale(0.97);
 }
 
 /* DAILY GOALS */
@@ -214,7 +286,7 @@ button:hover {
 .goal-input {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
     align-items: center;
 }
 
@@ -225,16 +297,53 @@ button:hover {
 
 #goalList {
     list-style: none;
-    margin-top: 20px;
+    margin-top: 22px;
 }
 
 #goalList li {
-    padding: 15px;
-    margin-bottom: 12px;
-    border-radius: 12px;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 17px;
+    margin-bottom: 13px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.075);
+    border: 1px solid rgba(255,255,255,0.12);
     color: #e5defa;
+    transition: 0.3s ease;
+    flex-wrap: wrap;
+}
+
+#goalList li:hover {
+    background: rgba(139,92,246,0.12);
+    border-color: rgba(185,149,255,0.3);
+}
+
+/* CHECKBOX FIX */
+
+#goalList input[type="checkbox"] {
+    appearance: auto;
+    -webkit-appearance: checkbox;
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    accent-color: #9565ff;
+    flex-shrink: 0;
+    box-shadow: none;
+}
+
+#goalList span {
+    flex: 1;
+    min-width: 100px;
+    overflow-wrap: anywhere;
+}
+
+#goalList button {
+    margin: 0;
+    padding: 10px 18px;
 }
 
 /* STUDY TIMER */
@@ -244,34 +353,48 @@ button:hover {
 }
 
 .timer-display {
-    font-size: 65px;
+    font-size: 72px;
     font-weight: bold;
     color: #d9c5ff;
-    margin: 25px 0;
-    letter-spacing: 4px;
+    margin: 30px 0;
+    letter-spacing: 5px;
+    text-shadow: 0 0 25px rgba(167,139,250,0.35);
 }
 
 .timer-buttons {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
 }
 
 .timer-note {
     color: #aaa3c5;
-    font-size: 13px;
-    margin-top: 20px;
+    font-size: 14px;
+    margin-top: 22px;
 }
 
 /* EXAM COUNTDOWN */
 
+#examName,
+#examDate {
+    margin-bottom: 12px;
+}
+
+#saveExam {
+    margin-left: 5px;
+}
+
 #examResult {
-    margin-top: 20px;
-    padding: 18px;
-    border-radius: 12px;
+    margin-top: 22px;
+    padding: 20px;
+    border-radius: 14px;
     background: rgba(139,92,246,0.12);
     color: #d9c5ff;
+    border: 1px solid rgba(255,255,255,0.12);
+}
+
+#examResult div {
     border: 1px solid rgba(255,255,255,0.1);
 }
 
@@ -279,21 +402,36 @@ button:hover {
 
 footer {
     text-align: center;
-    padding: 35px 15px;
-    background: rgba(10,8,25,0.65);
+    padding: 40px 15px;
+    background: rgba(10,8,25,0.75);
     border-top: 1px solid rgba(255,255,255,0.1);
-    margin-top: 50px;
+    margin-top: 55px;
 }
 
 footer h3 {
     color: #d9c5ff;
     margin-bottom: 12px;
+    font-size: 23px;
 }
 
 footer p {
     color: #aaa3c5;
     font-size: 14px;
-    margin: 8px 0;
+    margin: 9px 0;
+}
+
+/* ANIMATIONS */
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* RESPONSIVE DESIGN */
@@ -309,35 +447,63 @@ footer p {
     .navbar nav {
         flex-wrap: wrap;
         justify-content: center;
-        gap: 15px;
+        gap: 17px;
     }
 
     .container {
         width: 92%;
+        margin: 25px auto;
     }
 
     .welcome {
-        padding: 28px 22px;
+        padding: 32px 23px;
     }
 
     .welcome h1 {
-        font-size: 27px;
+        font-size: 28px;
     }
 
     .stats {
         grid-template-columns: 1fr;
-        gap: 15px;
+        gap: 16px;
     }
 
     .stat-card {
-        padding: 22px;
+        padding: 24px;
     }
 
     .card {
-        padding: 23px 18px;
+        padding: 25px 19px;
+    }
+
+    .card h2 {
+        font-size: 22px;
     }
 
     .timer-display {
-        font-size: 50px;
+        font-size: 52px;
+    }
+
+    .goal-input {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .goal-input input {
+        width: 100%;
+    }
+
+    #goalList li {
+        gap: 10px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
     }
 }
