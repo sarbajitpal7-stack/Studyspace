@@ -507,3 +507,69 @@ footer p {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ===== STUDYSPACE ANIMATED STAR BACKGROUND ===== */
+
+body {
+    position: relative;
+    isolation: isolate;
+    overflow-x: hidden;
+}
+
+/* First layer of stars */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+
+    background-image:
+        radial-gradient(2px 2px at 10% 20%, white 99%, transparent),
+        radial-gradient(2px 2px at 30% 70%, white 99%, transparent),
+        radial-gradient(2px 2px at 50% 40%, white 99%, transparent),
+        radial-gradient(2px 2px at 70% 15%, white 99%, transparent),
+        radial-gradient(2px 2px at 85% 60%, white 99%, transparent),
+        radial-gradient(2px 2px at 95% 85%, white 99%, transparent);
+
+    background-size: 350px 350px;
+    opacity: 0.65;
+    animation: starsTwinkle 3s ease-in-out infinite alternate;
+}
+
+/* Second layer of stars */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+
+    background-image:
+        radial-gradient(1px 1px at 15% 55%, white 99%, transparent),
+        radial-gradient(2px 2px at 40% 10%, white 99%, transparent),
+        radial-gradient(1px 1px at 65% 80%, white 99%, transparent),
+        radial-gradient(2px 2px at 90% 35%, white 99%, transparent);
+
+    background-size: 250px 250px;
+    opacity: 0.45;
+    animation: starsMove 15s linear infinite;
+}
+
+@keyframes starsTwinkle {
+    from {
+        opacity: 0.25;
+    }
+    to {
+        opacity: 0.9;
+    }
+}
+
+@keyframes starsMove {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-35px);
+    }
+}
