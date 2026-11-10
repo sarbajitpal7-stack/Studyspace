@@ -573,3 +573,186 @@ body::after {
         transform: translateY(-35px);
     }
 }
+
+/* =====================================
+   STUDYSPACE - PREMIUM ANIMATION PACK
+===================================== */
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Welcome section animation */
+.welcome {
+    position: relative;
+    overflow: hidden;
+    animation: welcomeAppear 1.2s ease both,
+               welcomeFloat 7s ease-in-out infinite;
+}
+
+/* Moving light shimmer */
+.welcome::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 65%;
+    height: 100%;
+    pointer-events: none;
+
+    background: linear-gradient(
+        110deg,
+        transparent,
+        rgba(255,255,255,0.08),
+        transparent
+    );
+
+    transform: skewX(-20deg);
+    animation: lightSweep 8s ease-in-out infinite;
+}
+
+@keyframes lightSweep {
+    0%, 65% {
+        left: -120%;
+    }
+    100% {
+        left: 150%;
+    }
+}
+
+/* Welcome floating movement */
+@keyframes welcomeFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes welcomeAppear {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Dashboard card animations */
+.stat-card,
+.card {
+    transition: transform 0.35s ease,
+                box-shadow 0.35s ease,
+                border-color 0.35s ease;
+
+    animation: cardAppear 0.9s ease both;
+}
+
+.stat-card:nth-child(1) {
+    animation-delay: 0.15s;
+}
+
+.stat-card:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+.stat-card:nth-child(3) {
+    animation-delay: 0.45s;
+}
+
+@keyframes cardAppear {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Hover glow effect */
+.stat-card:hover,
+.card:hover {
+    transform: translateY(-9px) scale(1.015);
+
+    border-color: rgba(190, 150, 255, 0.8);
+
+    box-shadow:
+        0 15px 35px rgba(120, 70, 255, 0.22),
+        0 0 22px rgba(160, 110, 255, 0.15);
+}
+
+/* Navigation animation */
+nav a {
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+nav a::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    width: 0;
+    height: 2px;
+    background: #c9a7ff;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+nav a:hover {
+    color: #d8bdff;
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+/* Button animation */
+button {
+    transition: transform 0.25s ease,
+                box-shadow 0.25s ease,
+                filter 0.25s ease;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 20px rgba(150, 100, 255, 0.3);
+    filter: brightness(1.12);
+}
+
+button:active {
+    transform: scale(0.96);
+}
+
+/* Animated glow around study timer */
+.timer {
+    transition: box-shadow 0.4s ease;
+    animation: timerGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes timerGlow {
+    from {
+        box-shadow: 0 0 10px rgba(150, 100, 255, 0.08);
+    }
+    to {
+        box-shadow: 0 0 28px rgba(150, 100, 255, 0.22);
+    }
+}
+
+/* Respect reduced-motion settings */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
