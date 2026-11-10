@@ -238,6 +238,11 @@ goalInput.addEventListener("keydown", function (event) {
 
 // POMODORO STUDY TIMER
 
+
+// =================================
+// PREMIUM CIRCULAR POMODORO TIMER
+// =================================
+
 const timerDisplay = document.getElementById("timerDisplay");
 
 const startButton = document.getElementById("startTimer");
@@ -248,6 +253,9 @@ const resetButton = document.getElementById("resetTimer");
 
 const timerNote = document.querySelector(".timer-note");
 
+const timerRing = document.getElementById("timerRing");
+
+const timerMode = document.getElementById("timerMode");
 
 const studyDuration = 25 * 60;
 
@@ -260,6 +268,8 @@ let timerInterval = null;
 let isBreak = false;
 
 
+// DISPLAY TIMER AND PROGRESS
+
 function displayTimer() {
 
     const minutes = Math.floor(remainingTime / 60);
@@ -267,13 +277,43 @@ function displayTimer() {
     const seconds = remainingTime % 60;
 
     timerDisplay.textContent =
-
         String(minutes).padStart(2, "0") + ":" +
-
         String(seconds).padStart(2, "0");
+
+    // Calculate circular progress
+
+    const totalDuration = isBreak
+        ? breakDuration
+        : studyDuration;
+
+    const progress =
+        ((totalDuration - remainingTime) / totalDuration) * 100;
+
+    timerRing.style.setProperty(
+        "--progress",
+        progress + "%"
+    );
+
+    // Change appearance during break
+
+    if (isBreak) {
+
+        timerRing.classList.add("break-mode");
+
+        timerMode.textContent = "BREAK MODE";
+
+    } else {
+
+        timerRing.classList.remove("break-mode");
+
+        timerMode.textContent = "FOCUS MODE";
+
+    }
 
 }
 
+
+// START TIMER
 
 function startTimer() {
 
@@ -282,6 +322,8 @@ function startTimer() {
     timerInterval = setInterval(function () {
 
         remainingTime--;
+
+        // Count study time only
 
         if (!isBreak) {
 
@@ -295,6 +337,8 @@ function startTimer() {
 
         displayTimer();
 
+
+        // WHEN TIMER FINISHES
 
         if (remainingTime <= 0) {
 
@@ -311,22 +355,20 @@ function startTimer() {
 
                 updateStats();
 
-                alert(
-                    "Great work! Study session completed. Time for a 5-minute break."
-                );
-
                 isBreak = true;
 
                 remainingTime = breakDuration;
 
                 timerNote.textContent =
-                    "Break time! Relax for 5 minutes.";
+                    "☕ Break time! Relax for 5 minutes.";
 
-            } else {
+                displayTimer();
 
                 alert(
-                    "Break completed! Ready for another study session?"
+                    "Excellent work! Your study session is complete. Enjoy your 5-minute break!"
                 );
+
+            } else {
 
                 isBreak = false;
 
@@ -335,9 +377,13 @@ function startTimer() {
                 timerNote.textContent =
                     "25 minutes study • 5 minutes break";
 
-            }
+                displayTimer();
 
-            displayTimer();
+                alert(
+                    "Your break is complete! Ready for another study session?"
+                );
+
+            }
 
         }
 
@@ -345,6 +391,8 @@ function startTimer() {
 
 }
 
+
+// PAUSE TIMER
 
 function pauseTimer() {
 
@@ -354,6 +402,8 @@ function pauseTimer() {
 
 }
 
+
+// RESET TIMER
 
 function resetTimer() {
 
@@ -371,11 +421,14 @@ function resetTimer() {
 }
 
 
+// BUTTON EVENTS
+
 startButton.addEventListener("click", startTimer);
 
 pauseButton.addEventListener("click", pauseTimer);
 
 resetButton.addEventListener("click", resetTimer);
+
 
 
 // EXAM COUNTDOWN
