@@ -1,8 +1,9 @@
-/* FIX STATISTICS CARDS */
+
+/* STATISTICS CARDS */
 
 .stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 22px;
     margin: 35px 0;
 }
@@ -10,15 +11,16 @@
 .stat-card {
     padding: 28px;
     border-radius: 20px;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     backdrop-filter: blur(12px);
-    transition: 0.3s;
+    -webkit-backdrop-filter: blur(12px);
+    transition: 0.3s ease;
 }
 
 .stat-card:hover {
     transform: translateY(-5px);
-    background: rgba(255,255,255,0.12);
+    background: rgba(255, 255, 255, 0.12);
 }
 
 .stat-card h3 {
@@ -36,4 +38,17 @@
 .stat-card span {
     font-size: 13px;
     color: #bcb8d6;
+}
+
+/* MOBILE RESPONSIVENESS */
+
+@media (max-width: 768px) {
+    .stats {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .stat-card {
+        padding: 22px;
+    }
 }
