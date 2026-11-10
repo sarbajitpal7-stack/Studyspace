@@ -756,3 +756,152 @@ button:active {
     }
 }
 
+/* ==================================
+   STUDYSPACE - CIRCULAR TIMER DESIGN
+================================== */
+
+.timer-card {
+    text-align: center;
+}
+
+/* Circular progress ring */
+
+.timer-ring {
+    --progress: 0%;
+
+    width: 245px;
+    height: 245px;
+
+    margin: 35px auto;
+
+    border-radius: 50%;
+
+    background: conic-gradient(
+        #bd91ff var(--progress),
+        rgba(255, 255, 255, 0.10) var(--progress)
+    );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+
+    box-shadow:
+        0 0 25px rgba(168, 110, 255, 0.25),
+        inset 0 0 15px rgba(255, 255, 255, 0.05);
+
+    transition: box-shadow 0.5s ease;
+}
+
+/* Inner circle */
+
+.timer-center {
+    width: 215px;
+    height: 215px;
+
+    border-radius: 50%;
+
+    background: linear-gradient(
+        145deg,
+        #21183f,
+        #15112e
+    );
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Timer numbers */
+
+.timer-display {
+    font-size: 48px;
+    font-weight: 800;
+
+    color: #ffffff;
+
+    letter-spacing: 2px;
+
+    margin: 8px 0;
+}
+
+/* Focus and break labels */
+
+.timer-mode {
+    font-size: 12px;
+    font-weight: bold;
+
+    letter-spacing: 3px;
+
+    color: #c9a4ff;
+}
+
+.timer-subtitle {
+    font-size: 13px;
+    color: #b9add6;
+}
+
+/* Break mode colour */
+
+.timer-ring.break-mode {
+    background: conic-gradient(
+        #55d6b0 var(--progress),
+        rgba(255, 255, 255, 0.10) var(--progress)
+    );
+
+    box-shadow:
+        0 0 30px rgba(85, 214, 176, 0.25);
+}
+
+.timer-ring.break-mode .timer-mode {
+    color: #55d6b0;
+}
+
+/* Timer buttons */
+
+.timer-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.timer-buttons button {
+    min-width: 105px;
+    padding: 12px 18px;
+    border-radius: 12px;
+}
+
+/* Timer note */
+
+.timer-note {
+    margin-top: 22px;
+    color: #c9b9e8;
+    font-size: 14px;
+}
+
+/* Responsive timer */
+
+@media (max-width: 500px) {
+
+    .timer-ring {
+        width: 210px;
+        height: 210px;
+    }
+
+    .timer-center {
+        width: 184px;
+        height: 184px;
+    }
+
+    .timer-display {
+        font-size: 40px;
+    }
+
+}
+
