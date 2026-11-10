@@ -1009,3 +1009,58 @@ button:active {
 
 }
 
+/* =================================
+   EXAM COUNTDOWN UPGRADE
+================================= */
+
+#exam input,
+#exam select {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+#exam select {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: #211b3b;
+    color: white;
+    font-size: 15px;
+    outline: none;
+}
+
+#exam select option {
+    background: #211b3b;
+    color: white;
+}
+
+.exam-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    animation: examCardAppear 0.45s ease both;
+}
+
+.exam-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.18);
+}
+
+.exam-card h3 {
+    overflow-wrap: anywhere;
+}
+
+.exam-countdown {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+@keyframes examCardAppear {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
