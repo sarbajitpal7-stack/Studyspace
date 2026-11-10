@@ -4,7 +4,9 @@
 ================================= */
 
 
-// DATE AND MOTIVATIONAL QUOTE
+/* =================================
+   DATE AND MOTIVATIONAL QUOTE
+================================= */
 
 const today = new Date();
 
@@ -52,7 +54,9 @@ if (welcomeSection) {
 }
 
 
-// DAILY DATA STORAGE
+/* =================================
+   DAILY DATA STORAGE
+================================= */
 
 const todayKey = new Date().toLocaleDateString("en-CA");
 
@@ -76,7 +80,9 @@ function saveDailyData() {
 }
 
 
-// DASHBOARD STATISTICS
+/* =================================
+   DASHBOARD STATISTICS
+================================= */
 
 function updateStats() {
 
@@ -94,7 +100,9 @@ function updateStats() {
 }
 
 
-// DAILY GOALS
+/* =================================
+   DAILY GOALS
+================================= */
 
 const goalInput = document.getElementById("goalInput");
 
@@ -185,7 +193,9 @@ function displayGoals() {
 }
 
 
-// ADD NEW GOAL
+/* =================================
+   ADD NEW GOAL
+================================= */
 
 function addGoal() {
 
@@ -236,12 +246,9 @@ goalInput.addEventListener("keydown", function (event) {
 });
 
 
-// POMODORO STUDY TIMER
-
-
-// =================================
-// PREMIUM CIRCULAR POMODORO TIMER
-// =================================
+/* =================================
+   PREMIUM CIRCULAR POMODORO TIMER
+================================= */
 
 const timerDisplay = document.getElementById("timerDisplay");
 
@@ -256,6 +263,7 @@ const timerNote = document.querySelector(".timer-note");
 const timerRing = document.getElementById("timerRing");
 
 const timerMode = document.getElementById("timerMode");
+
 
 const studyDuration = 25 * 60;
 
@@ -280,6 +288,7 @@ function displayTimer() {
         String(minutes).padStart(2, "0") + ":" +
         String(seconds).padStart(2, "0");
 
+
     // Calculate circular progress
 
     const totalDuration = isBreak
@@ -293,6 +302,7 @@ function displayTimer() {
         "--progress",
         progress + "%"
     );
+
 
     // Change appearance during break
 
@@ -319,9 +329,17 @@ function startTimer() {
 
     if (timerInterval !== null) return;
 
+    // Start pulsing animation
+
+    timerRing.classList.remove("celebration");
+
+    timerRing.classList.add("timer-running");
+
+
     timerInterval = setInterval(function () {
 
         remainingTime--;
+
 
         // Count study time only
 
@@ -347,13 +365,25 @@ function startTimer() {
             timerInterval = null;
 
 
+            // Stop pulse and show celebration
+
+            timerRing.classList.remove("timer-running");
+
+            timerRing.classList.add("celebration");
+
+
             if (!isBreak) {
+
+                // Increase completed focus sessions
 
                 dailyData.sessions++;
 
                 saveDailyData();
 
                 updateStats();
+
+
+                // Start break mode
 
                 isBreak = true;
 
@@ -369,6 +399,8 @@ function startTimer() {
                 );
 
             } else {
+
+                // Break completed
 
                 isBreak = false;
 
@@ -400,6 +432,10 @@ function pauseTimer() {
 
     timerInterval = null;
 
+    // Stop pulsing animation
+
+    timerRing.classList.remove("timer-running");
+
 }
 
 
@@ -408,6 +444,10 @@ function pauseTimer() {
 function resetTimer() {
 
     pauseTimer();
+
+    // Remove celebration animation
+
+    timerRing.classList.remove("celebration");
 
     isBreak = false;
 
@@ -430,8 +470,9 @@ pauseButton.addEventListener("click", pauseTimer);
 resetButton.addEventListener("click", resetTimer);
 
 
-
-// EXAM COUNTDOWN
+/* =================================
+   EXAM COUNTDOWN
+================================= */
 
 const examName = document.getElementById("examName");
 
@@ -605,7 +646,9 @@ saveExamButton.addEventListener("click", function () {
 });
 
 
-// INITIALISE WEBSITE
+/* =================================
+   INITIALISE WEBSITE
+================================= */
 
 displayGoals();
 
