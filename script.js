@@ -341,3 +341,40 @@ displayGoals();
 displayTimer();
 displayExams();
 updateStats();
+
+/* DAILY GOALS IMPROVEMENT */
+
+#goalList li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+#goalList input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    margin: 0;
+    accent-color: #a78bfa;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+#goalList span {
+    flex: 1;
+    color: #e5defa;
+    overflow-wrap: anywhere;
+}
+
+#goalList button {
+    background: #dc4565;
+    padding: 9px 14px;
+    margin: 0;
+    flex-shrink: 0;
+}
+
