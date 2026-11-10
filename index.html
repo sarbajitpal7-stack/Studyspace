@@ -155,33 +155,35 @@
 
         <!-- Exam Countdown -->
 
-        <section class="card" id="exam">
 
-            <h2>📅 Exam Countdown</h2>
+<section class="card" id="exam">
+    <h2>📅 Exam Countdown</h2>
+    <p>Never lose track of your upcoming examinations.</p>
 
-            <p>Never lose track of your upcoming examinations.</p>
+    <input
+        type="text"
+        id="examName"
+        placeholder="Enter exam name (e.g. Physics)"
+    >
 
-            <input
-                type="text"
-                id="examName"
-                placeholder="Enter exam name..."
-            >
+    <input type="date" id="examDate">
 
-            <input
-                type="date"
-                id="examDate"
-            >
+    <select id="examColor">
+        <option value="#8b5cf6">🟣 Purple</option>
+        <option value="#3b82f6">🔵 Blue</option>
+        <option value="#22c55e">🟢 Green</option>
+        <option value="#f59e0b">🟠 Orange</option>
+        <option value="#ec4899">🩷 Pink</option>
+        <option value="#ef4444">🔴 Red</option>
+    </select>
 
-            <button id="saveExam">Save Exam</button>
+    <button id="saveExam">＋ Add Exam</button>
 
-            <div id="examResult">
-                No upcoming exam added yet.
-            </div>
+    <div id="examResult">
+        No upcoming exam added yet.
+    </div>
+</section>
 
-        </section>
-
-
-    </main>
 
 
     <!-- Footer -->
