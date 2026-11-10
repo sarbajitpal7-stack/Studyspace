@@ -105,33 +105,52 @@
         </section>
 
 
-        <!-- Study Timer -->
+        
+<!-- Study Timer -->
 
-        <section class="card timer-card" id="timer">
+<section class="card timer-card" id="timer">
 
-            <h2>⏱ Study Timer</h2>
+    <h2>⏱ Study Timer</h2>
 
-            <p>Focus on your studies, one session at a time.</p>
+    <p>Focus on your studies, one session at a time.</p>
 
-            <div class="timer-display" id="timerDisplay">
+    <div class="timer-ring" id="timerRing">
+
+        <div class="timer-center">
+
+            <p class="timer-mode" id="timerMode">
+                FOCUS MODE
+            </p>
+
+            <div class="timer-display" id="timerDisplay"
+                 aria-live="off">
                 25:00
             </div>
 
-            <div class="timer-buttons">
+            <span class="timer-subtitle">
+                Stay focused
+            </span>
 
-                <button id="startTimer">Start</button>
+        </div>
 
-                <button id="pauseTimer">Pause</button>
+    </div>
 
-                <button id="resetTimer">Reset</button>
+    <div class="timer-buttons">
 
-            </div>
+        <button id="startTimer">▶ Start</button>
 
-            <p class="timer-note">
-                25 minutes study • 5 minutes break
-            </p>
+        <button id="pauseTimer">Ⅱ Pause</button>
 
-        </section>
+        <button id="resetTimer">↻ Reset</button>
+
+    </div>
+
+    <p class="timer-note" id="timerNote">
+        25 minutes study • 5 minutes break
+    </p>
+
+</section>
+
 
 
         <!-- Exam Countdown -->
