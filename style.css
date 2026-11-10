@@ -905,3 +905,107 @@ button:active {
 
 }
 
+/* =====================================
+   STUDYSPACE - PREMIUM TIMER ANIMATIONS
+===================================== */
+
+/* Circular timer running animation */
+
+.timer-ring.timer-running {
+    animation: timerPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(
+            0 0 5px rgba(180, 130, 255, 0.2)
+        );
+    }
+
+    50% {
+        transform: scale(1.025);
+        filter: drop-shadow(
+            0 0 18px rgba(180, 130, 255, 0.55)
+        );
+    }
+
+}
+
+
+/* Green animation during break */
+
+.timer-ring.break-mode.timer-running {
+    animation: breakPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes breakPulse {
+
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(
+            0 0 5px rgba(85, 214, 176, 0.2)
+        );
+    }
+
+    50% {
+        transform: scale(1.025);
+        filter: drop-shadow(
+            0 0 18px rgba(85, 214, 176, 0.55)
+        );
+    }
+
+}
+
+
+/* Celebration animation */
+
+.timer-ring.celebration {
+    animation: timerCelebrate 0.8s ease-in-out 2;
+}
+
+@keyframes timerCelebrate {
+
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    25% {
+        transform: scale(1.07);
+    }
+
+    50% {
+        transform: scale(0.97);
+    }
+
+    75% {
+        transform: scale(1.05);
+    }
+
+}
+
+
+/* Smooth timer transitions */
+
+.timer-ring,
+.timer-center,
+.timer-mode {
+    transition:
+        background 0.5s ease,
+        color 0.5s ease,
+        box-shadow 0.5s ease;
+}
+
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .timer-ring.timer-running,
+    .timer-ring.celebration {
+        animation: none;
+    }
+
+}
+
