@@ -167,3 +167,59 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+    // Theme settings
+    const themeKey = "studyspace_theme";
+
+    let currentTheme = localStorage.getItem(themeKey) || "dark";
+
+    // Apply saved theme
+    document.body.setAttribute("data-theme", currentTheme);
+
+    // Create theme settings section
+    const themeSection = document.createElement("div");
+
+    themeSection.innerHTML = `
+        <hr>
+        <h2>🌙 Appearance</h2>
+
+        <p class="dashboard-settings-description">
+            Switch between dark mode and light mode.
+        </p>
+
+        <button type="button"
+                class="dashboard-reset-button"
+                id="settingsThemeToggle">
+        </button>
+
+        <p class="dashboard-settings-status" id="themeStatus"></p>
+    `;
+
+    card.appendChild(themeSection);
+
+    const themeButton = document.getElementById("settingsThemeToggle");
+
+    // Update button text
+    function updateThemeButton() {
+        themeButton.textContent =
+            currentTheme === "dark"
+                ? "☀️ Switch to Light Mode"
+                : "🌙 Switch to Dark Mode";
+    }
+
+    updateThemeButton();
+
+    // Change theme
+    themeButton.addEventListener("click", function () {
+
+        currentTheme = currentTheme === "dark" ? "light" : "dark";
+
+        localStorage.setItem(themeKey, currentTheme);
+
+        document.body.setAttribute("data-theme", currentTheme);
+
+        updateThemeButton();
+
+        document.getElementById("themeStatus").textContent =
+            "Appearance preference saved!";
+    });
