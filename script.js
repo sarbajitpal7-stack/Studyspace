@@ -240,6 +240,93 @@ function displayTimer() {
     }
 }
 
+// =================================
+// STUDY SESSION HISTORY
+// =================================
+
+const historyStorageKey = "studyspace_session_history";
+
+function getSessionHistory() {
+    try {
+        return JSON.parse(
+            localStorage.getItem(historyStorageKey)
+        ) || [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function saveSessionHistory() {
+    localStorage.setItem(
+        historyStorageKey,
+        JSON.stringify(sessionHistory)
+    );
+}
+
+let sessionHistory = getSessionHistory();
+
+function recordCompletedSession() {
+    const now = new Date();
+
+    const session = {
+        date: now.toLocaleDateString("en-IN"),
+        completedAt: now.toLocaleTimeString("en-IN", {
+            hour: "2-digit",
+            minute: "2-digit"
+        }),
+        durationMinutes: 25
+    };
+
+    sessionHistory.unshift(session);
+
+    // Keep only the latest 100 sessions
+    sessionHistory = sessionHistory.slice(0, 100);
+
+    saveSessionHistory();
+    renderSessionHistory();
+}
+
+function renderSessionHistory() {
+    const list = document.getElementById("sessionHistoryList");
+    const totalSessions = document.getElementById("historyTotalSessions");
+    const totalTime = document.getElementById("historyTotalTime");
+    const count = document.getElementById("historySessionCount");
+
+    if (!list || !totalSessions || !totalTime || !count) return;
+
+    totalSessions.textContent = sessionHistory.length;
+
+    const minutes = sessionHistory.reduce(
+        (total, session) => total + session.durationMinutes,
+        0
+    );
+
+    totalTime.textContent = minutes + " min";
+    count.textContent = sessionHistory.length + " records";
+
+    if (sessionHistory.length === 0) {
+        list.innerHTML = `
+            <p class="empty-session-history">
+                Your completed study sessions will appear here.
+            </p>
+        `;
+        return;
+    }
+
+    list.innerHTML = sessionHistory.map(session => `
+        <div class="session-history-item">
+            <div>
+                <strong>🎯 Focus Session</strong>
+                <p>${session.date} • ${session.completedAt}</p>
+            </div>
+            <strong>${session.durationMinutes} min</strong>
+        </div>
+    `).join("");
+}
+
+// Display saved history when the website loads
+renderSessionHistory();
+
 function startTimer() {
     if (timerInterval !== null || !timerRing) return;
 
@@ -253,6 +340,7 @@ function startTimer() {
             dailyData.studySeconds++;
             saveDailyData();
             updateStats();
+           recordCompletedSession();
         }
 
         displayTimer();
