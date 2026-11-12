@@ -1912,3 +1912,152 @@ body[data-theme="light"] .accent-settings-status {
         min-width: 0;
     }
 }
+
+/* =====================================
+   STUDYSPACE - IMMERSIVE FOCUS MODE
+===================================== */
+
+body.focus-mode-open {
+    overflow: hidden;
+}
+
+.timer-card.focus-mode-active {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 9999 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 100vh !important;
+    min-height: 100vh;
+    margin: 0 !important;
+    padding: 35px 20px !important;
+    border-radius: 0 !important;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background:
+        radial-gradient(circle at 50% 35%, #30245e, transparent 55%),
+        linear-gradient(135deg, #080d25, #171438, #090d20);
+    animation: focusModeEnter 0.5s ease;
+}
+
+@keyframes focusModeEnter {
+    from {
+        opacity: 0.7;
+        transform: scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.timer-card.focus-mode-active h2 {
+    font-size: clamp(25px, 4vw, 38px);
+    margin-bottom: 12px;
+}
+
+.timer-card.focus-mode-active > p {
+    font-size: 16px;
+}
+
+.timer-card.focus-mode-active .timer-ring {
+    width: 280px;
+    height: 280px;
+    margin: 30px auto;
+}
+
+.timer-card.focus-mode-active .timer-center {
+    width: 248px;
+    height: 248px;
+}
+
+.timer-card.focus-mode-active .timer-display {
+    font-size: 58px;
+}
+
+.focus-mode-exit {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    padding: 11px 18px;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.10);
+    color: white;
+    cursor: pointer;
+}
+
+.focus-environment {
+    margin-top: 25px;
+}
+
+.focus-environment h3 {
+    margin-bottom: 14px;
+    font-size: 16px;
+    color: #ddd6fe;
+}
+
+.focus-environment-options {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.focus-environment-options button {
+    padding: 11px 17px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    color: white;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.focus-environment-options button:hover,
+.focus-environment-options button.selected {
+    background: rgba(139,92,246,0.3);
+    border-color: #a78bfa;
+    transform: translateY(-2px);
+}
+
+.timer-card.focus-mode-active[data-environment="rain"] {
+    background:
+        radial-gradient(circle at 50% 30%, #28445b, transparent 55%),
+        linear-gradient(135deg, #081725, #142b40, #091522);
+}
+
+.timer-card.focus-mode-active[data-environment="nature"] {
+    background:
+        radial-gradient(circle at 50% 30%, #315c46, transparent 55%),
+        linear-gradient(135deg, #0b211c, #183d30, #091b19);
+}
+
+@media (max-width: 600px) {
+    .timer-card.focus-mode-active {
+        padding: 75px 15px 30px !important;
+    }
+
+    .timer-card.focus-mode-active .timer-ring {
+        width: 230px;
+        height: 230px;
+    }
+
+    .timer-card.focus-mode-active .timer-center {
+        width: 204px;
+        height: 204px;
+    }
+
+    .timer-card.focus-mode-active .timer-display {
+        font-size: 45px;
+    }
+
+    .focus-mode-exit {
+        top: 15px;
+        right: 15px;
+    }
+}
