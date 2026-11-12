@@ -1413,3 +1413,120 @@ updatePersonalGreeting();
     applyAccentColour(selectedColour, false);
 
 })();
+
+/* =====================================
+   STUDYSPACE - IMMERSIVE FOCUS MODE
+===================================== */
+
+(function () {
+
+    const timerCard = document.querySelector(".timer-card");
+    const enterButton = document.getElementById("enterFocusMode");
+
+    if (!timerCard || !enterButton) return;
+
+    // Create Exit Focus Mode button
+    const exitButton = document.createElement("button");
+
+    exitButton.type = "button";
+    exitButton.className = "focus-mode-exit";
+    exitButton.textContent = "✕ Exit Focus Mode";
+    exitButton.style.display = "none";
+
+    // Create environment selector
+    const environment = document.createElement("div");
+
+    environment.className = "focus-environment";
+
+    environment.innerHTML = `
+        <h3>Choose Your Environment</h3>
+        <div class="focus-environment-options">
+            <button type="button" data-environment="cosmic" class="selected">
+                🌌 Cosmic Night
+            </button>
+            <button type="button" data-environment="rain">
+                🌧️ Rainy Window
+            </button>
+            <button type="button" data-environment="nature">
+                🌿 Nature Retreat
+            </button>
+        </div>
+    `;
+
+    // Add controls to the existing timer card
+    timerCard.appendChild(exitButton);
+    timerCard.appendChild(environment);
+
+    const environmentButtons =
+        environment.querySelectorAll("button");
+
+    // Enter full-screen focus mode
+    function enterFocusMode() {
+
+        timerCard.classList.add("focus-mode-active");
+        document.body.classList.add("focus-mode-open");
+
+        timerCard.dataset.environment = "cosmic";
+
+        enterButton.style.display = "none";
+        exitButton.style.display = "block";
+
+    }
+
+    // Exit full-screen focus mode
+    function exitFocusMode() {
+
+        timerCard.classList.remove("focus-mode-active");
+        document.body.classList.remove("focus-mode-open");
+
+        enterButton.style.display = "inline-block";
+        exitButton.style.display = "none";
+
+    }
+
+    // Change the focus environment
+    environmentButtons.forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const selectedEnvironment =
+                button.dataset.environment;
+
+            timerCard.dataset.environment =
+                selectedEnvironment;
+
+            environmentButtons.forEach(function (item) {
+
+                item.classList.remove("selected");
+                item.setAttribute("aria-pressed", "false");
+
+            });
+
+            button.classList.add("selected");
+            button.setAttribute("aria-pressed", "true");
+
+        });
+
+    });
+
+    // Button events
+    enterButton.addEventListener("click", enterFocusMode);
+
+    exitButton.addEventListener("click", exitFocusMode);
+
+    // Escape key exits focus mode
+    document.addEventListener("keydown", function (event) {
+
+        if (
+            event.key === "Escape" &&
+            timerCard.classList.contains("focus-mode-active")
+        ) {
+            exitFocusMode();
+        }
+
+    });
+
+    // Set initial environment button state
+    environmentButtons[0].setAttribute("aria-pressed", "true");
+
+})();
