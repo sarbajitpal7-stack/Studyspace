@@ -284,6 +284,191 @@ function recordCompletedSession() {
 
     saveSessionHistory();
     renderSessionHistory();
+   
+// =========================================
+// STUDY STREAK TRACKER
+// =========================================
+
+const streakStorageKey = "studyspace_best_streak";
+
+function getSessionDateKey(dateString) {
+    const parts = dateString.split("/");
+
+    if (parts.length !== 3) return null;
+
+    const day = Number(parts[0]);
+    const month = Number(parts[1]);
+    const year = Number(parts[2]);
+
+    const date = new Date(year, month - 1, day);
+
+    if (
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+    ) {
+        return null;
+    }
+
+    return year + "-" +
+        String(month).padStart(2, "0") + "-" +
+        String(day).padStart(2, "0");
+}
+
+function getLocalDateKey(date) {
+    return date.getFullYear() + "-" +
+        String(date.getMonth() + 1).padStart(2, "0") + "-" +
+        String(date.getDate()).padStart(2, "0");
+}
+
+function renderStudyStreak() {
+    const currentElement =
+        document.getElementById("currentStudyStreak");
+
+    const bestElement =
+        document.getElementById("bestStudyStreak");
+
+    const messageElement =
+        document.getElementById("streakMessage");
+
+    const weekElement =
+        document.getElementById("streakWeekDays");
+
+    if (!currentElement || !bestElement ||
+        !messageElement || !weekElement) return;
+
+    // Get unique dates with completed sessions
+    const activeDates = new Set();
+
+    sessionHistory.forEach(function(session) {
+        const key = getSessionDateKey(session.date);
+
+        if (key) {
+            activeDates.add(key);
+        }
+    });
+
+    // Calculate current streak
+    const today = new Date();
+    const todayKey = getLocalDateKey(today);
+
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    let currentStreak = 0;
+    let checkDate = new Date(today);
+
+    if (!activeDates.has(todayKey)) {
+        if (activeDates.has(getLocalDateKey(yesterday))) {
+            checkDate = yesterday;
+        } else {
+            checkDate = null;
+        }
+    }
+
+    while (checkDate &&
+        activeDates.has(getLocalDateKey(checkDate))) {
+
+        currentStreak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+    }
+
+    // Calculate best streak
+    const sortedDates = Array.from(activeDates).sort();
+
+    let bestStreak = 0;
+    let runningStreak = 0;
+    let previousDate = null;
+
+    sortedDates.forEach(function(key) {
+        const parts = key.split("-").map(Number);
+
+        const date = new Date(
+            parts[0],
+            parts[1] - 1,
+            parts[2]
+        );
+
+        if (previousDate) {
+            const difference = Math.round(
+                (date - previousDate) / 86400000
+            );
+
+            if (difference === 1) {
+                runningStreak++;
+            } else {
+                runningStreak = 1;
+            }
+        } else {
+            runningStreak = 1;
+        }
+
+        bestStreak = Math.max(bestStreak, runningStreak);
+        previousDate = date;
+    });
+
+    // Save best streak
+    const savedBest = Number(
+        localStorage.getItem(streakStorageKey)
+    ) || 0;
+
+    bestStreak = Math.max(bestStreak, savedBest);
+
+    localStorage.setItem(
+        streakStorageKey,
+        bestStreak
+    );
+
+    // Update streak numbers
+    currentElement.textContent = currentStreak + " days";
+    bestElement.textContent = bestStreak + " days";
+
+    // Update weekly activity
+    const startOfWeek = new Date(today);
+
+    const mondayOffset = (today.getDay() + 6) % 7;
+
+    startOfWeek.setDate(
+        today.getDate() - mondayOffset
+    );
+
+    const dayCards = weekElement.querySelectorAll(".streak-day");
+
+    dayCards.forEach(function(card) {
+        const dayNumber = Number(card.dataset.day);
+
+        const date = new Date(startOfWeek);
+        date.setDate(startOfWeek.getDate() + ((dayNumber + 6) % 7));
+
+        const key = getLocalDateKey(date);
+        const completed = activeDates.has(key);
+
+        card.classList.toggle("completed", completed);
+
+        const symbol = card.querySelector("strong");
+
+        if (symbol) {
+            symbol.textContent = completed ? "✓" : "○";
+        }
+    });
+
+    // Update message
+    if (currentStreak === 0) {
+        messageElement.textContent =
+            "Complete a focus session today to start your streak!";
+    } else if (currentStreak === 1) {
+        messageElement.textContent =
+            "Great start! Come back tomorrow to continue your streak.";
+    } else {
+        messageElement.textContent =
+            "Amazing! You have studied for " +
+            currentStreak + " consecutive days. Keep going!";
+    }
+}
+
+// Display streak when the website loads
+renderStudyStreak();
+
 }
 
 function renderSessionHistory() {
