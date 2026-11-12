@@ -2292,3 +2292,166 @@ body.focus-mode-open {
         animation: none !important;
     }
 }
+
+/* ==========================================
+   STAGE 6 - PREMIUM COMPLETION SCREEN
+========================================== */
+
+.focus-completion-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(4, 6, 20, 0.82);
+    backdrop-filter: blur(14px);
+}
+
+.focus-completion-overlay.show {
+    display: flex;
+    animation: completionFade 0.45s ease;
+}
+
+.focus-completion-card {
+    width: 100%;
+    max-width: 560px;
+    padding: 35px 25px;
+    text-align: center;
+    color: white;
+    background:
+        radial-gradient(circle at top, #38276b, transparent 65%),
+        linear-gradient(145deg, #17152f, #0b1022);
+    border: 1px solid rgba(167, 139, 250, 0.35);
+    border-radius: 25px;
+    box-shadow: 0 0 60px rgba(139, 92, 246, 0.25);
+    animation: completionPop 0.55s ease;
+}
+
+.completion-icon {
+    font-size: 65px;
+    margin-bottom: 15px;
+    animation: trophyFloat 2.5s ease-in-out infinite;
+}
+
+.focus-completion-card h2 {
+    font-size: clamp(25px, 5vw, 34px);
+    margin-bottom: 12px;
+    background: linear-gradient(90deg, #c4b5fd, #f0abfc);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.completion-message {
+    color: #d1d5e8;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.completion-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 25px 0;
+}
+
+.completion-stat {
+    padding: 15px 8px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 15px;
+}
+
+.completion-stat span {
+    font-size: 25px;
+}
+
+.completion-stat h3 {
+    font-size: 19px;
+    margin: 10px 0 5px;
+    color: #c4b5fd;
+}
+
+.completion-stat p {
+    font-size: 12px;
+    color: #cbd5e1;
+}
+
+.completion-quote {
+    color: #c4b5fd;
+    font-style: italic;
+    margin: 20px 0;
+    line-height: 1.5;
+}
+
+#continueBreakButton {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 13px;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    background: linear-gradient(110deg, #7c3aed, #a855f7);
+    box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3);
+    transition: 0.3s ease;
+}
+
+#continueBreakButton:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
+}
+
+@keyframes completionFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes completionPop {
+    from {
+        opacity: 0;
+        transform: scale(0.85) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes trophyFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-9px); }
+}
+
+@media (max-width: 480px) {
+    .focus-completion-card {
+        padding: 25px 15px;
+    }
+
+    .completion-stats {
+        gap: 6px;
+    }
+
+    .completion-stat {
+        padding: 12px 4px;
+    }
+
+    .completion-stat h3 {
+        font-size: 15px;
+    }
+
+    .completion-stat p {
+        font-size: 10px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .focus-completion-overlay,
+    .focus-completion-card,
+    .completion-icon {
+        animation: none !important;
+    }
+}
