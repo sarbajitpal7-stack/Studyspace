@@ -1523,3 +1523,31 @@ body[data-theme="light"] .name-save-message {
         padding-right: 12px;
     }
 }
+
+/* =========================================
+   STAGE 3 - DAILY MOTIVATIONAL QUOTE
+========================================= */
+
+.welcome-date {
+    margin-top: 18px;
+    font-size: 0.95rem;
+}
+
+.daily-quote {
+    margin-top: 12px;
+    padding: 12px 16px;
+    max-width: 700px;
+    border-left: 3px solid #b995ff;
+    border-radius: 0 10px 10px 0;
+    background: rgba(139, 92, 246, 0.12);
+    color: #e5d9ff !important;
+    font-size: 1rem;
+    font-style: italic;
+    line-height: 1.7;
+}
+
+body[data-theme="light"] .daily-quote {
+    color: #514078 !important;
+    background: rgba(139, 92, 246, 0.09);
+    border-left-color: #8055c7;
+}
