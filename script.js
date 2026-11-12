@@ -1180,3 +1180,261 @@ displayTimer();
 displayExams();
 updateStats();
 renderWeeklyAnalytics();
+
+/* =========================================
+   STAGE 6 - FOCUS SESSION COMPLETION SCREEN
+   Works with the existing Pomodoro timer.
+========================================= */
+
+(function initialiseFocusCompletionScreen() {
+
+    const originalAlert = window.alert;
+
+    window.alert = function (message) {
+
+        // Intercept only the focus-session completion alert.
+        if (
+            message !==
+            "Excellent work! Your study session is complete. Enjoy your 5-minute break!"
+        ) {
+            originalAlert.call(window, message);
+            return;
+        }
+
+        // Prevent multiple completion screens.
+        if (document.getElementById("focusCompletionOverlay")) {
+            return;
+        }
+
+        const overlay = document.createElement("div");
+        overlay.id = "focusCompletionOverlay";
+
+        overlay.innerHTML = `
+            <div class="completion-card">
+
+                <div class="completion-trophy">🏆</div>
+
+                <h2>Focus Session Complete!</h2>
+
+                <p class="completion-message">
+                    Excellent work! You completed 25 minutes of focused study.
+                    Take a well-deserved break.
+                </p>
+
+                <div class="completion-stats">
+
+                    <div class="completion-stat">
+                        <span>⏱️</span>
+                        <strong>25 min</strong>
+                        <small>Focus Time</small>
+                    </div>
+
+                    <div class="completion-stat">
+                        <span>🎯</span>
+                        <strong>${dailyData.sessions}</strong>
+                        <small>Sessions Today</small>
+                    </div>
+
+                    <div class="completion-stat">
+                        <span>📚</span>
+                        <strong>${formatStudyDuration(dailyData.studySeconds)}</strong>
+                        <small>Total Study Time</small>
+                    </div>
+
+                </div>
+
+                <p class="completion-quote">
+                    "Every focused minute brings you closer to your goals."
+                </p>
+
+                <button id="continueBreakButton" type="button">
+                    ☕ Start 5-Minute Break
+                </button>
+
+            </div>
+        `;
+
+        const style = document.createElement("style");
+
+        style.textContent = `
+            #focusCompletionOverlay {
+                position: fixed;
+                inset: 0;
+                z-index: 99999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                background: rgba(5, 8, 25, 0.88);
+                backdrop-filter: blur(14px);
+                animation: completionFade 0.4s ease;
+            }
+
+            .completion-card {
+                width: 100%;
+                max-width: 520px;
+                padding: 35px 25px;
+                text-align: center;
+                color: white;
+                background: linear-gradient(
+                    145deg,
+                    #211b45,
+                    #111827
+                );
+                border: 1px solid rgba(255,255,255,0.16);
+                border-radius: 25px;
+                box-shadow: 0 20px 70px rgba(0,0,0,0.5);
+                animation: completionPop 0.5s ease;
+            }
+
+            .completion-trophy {
+                font-size: 65px;
+                margin-bottom: 15px;
+                animation: trophyFloat 2s ease-in-out infinite;
+            }
+
+            .completion-card h2 {
+                font-size: 27px;
+                margin-bottom: 12px;
+                color: #c4a5ff;
+            }
+
+            .completion-message {
+                color: #d1d5db;
+                line-height: 1.6;
+                margin-bottom: 25px;
+            }
+
+            .completion-stats {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                margin-bottom: 25px;
+            }
+
+            .completion-stat {
+                padding: 15px 7px;
+                border-radius: 15px;
+                background: rgba(255,255,255,0.08);
+                border: 1px solid rgba(255,255,255,0.08);
+            }
+
+            .completion-stat span {
+                display: block;
+                font-size: 23px;
+                margin-bottom: 8px;
+            }
+
+            .completion-stat strong {
+                display: block;
+                font-size: 17px;
+                color: #c4a5ff;
+                overflow-wrap: anywhere;
+            }
+
+            .completion-stat small {
+                display: block;
+                font-size: 11px;
+                color: #cbd5e1;
+                margin-top: 6px;
+            }
+
+            .completion-quote {
+                font-style: italic;
+                color: #cbd5e1;
+                margin-bottom: 25px;
+                line-height: 1.5;
+            }
+
+            #continueBreakButton {
+                width: 100%;
+                padding: 14px;
+                border: none;
+                border-radius: 12px;
+                background: linear-gradient(
+                    135deg,
+                    #9565ff,
+                    #7045f5
+                );
+                color: white;
+                font-size: 15px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: transform 0.2s ease;
+            }
+
+            #continueBreakButton:hover {
+                transform: translateY(-3px);
+            }
+
+            @keyframes completionFade {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            @keyframes completionPop {
+                from {
+                    opacity: 0;
+                    transform: scale(0.85);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+
+            @keyframes trophyFloat {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-8px); }
+            }
+
+            @media (max-width: 450px) {
+                .completion-card {
+                    padding: 25px 15px;
+                }
+
+                .completion-card h2 {
+                    font-size: 22px;
+                }
+
+                .completion-stats {
+                    gap: 6px;
+                }
+
+                .completion-stat {
+                    padding: 12px 4px;
+                }
+
+                .completion-stat strong {
+                    font-size: 14px;
+                }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                #focusCompletionOverlay,
+                .completion-card,
+                .completion-trophy {
+                    animation: none;
+                }
+            }
+        `;
+
+        document.head.appendChild(style);
+        document.body.appendChild(overlay);
+
+        const continueButton =
+            document.getElementById("continueBreakButton");
+
+        continueButton.addEventListener("click", function () {
+
+            overlay.remove();
+
+            // The existing timer has already switched to break mode.
+            // Start its five-minute countdown.
+            if (startButton) {
+                startButton.click();
+            }
+        });
+    };
+
+})();
