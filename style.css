@@ -1671,3 +1671,244 @@ body[data-theme="light"] .dashboard-settings-status {
         grid-template-columns: 1fr;
     }
 }
+
+/* =========================================
+   STAGE 4 - CUSTOM ACCENT COLOURS
+========================================= */
+
+:root {
+    --ss-accent: #9565ff;
+    --ss-accent-light: #c4a5ff;
+    --ss-accent-dark: #7045f5;
+    --ss-accent-soft: rgba(149,101,255,0.16);
+    --ss-accent-glow: rgba(149,101,255,0.30);
+}
+
+/* Accent colour headings */
+
+.logo,
+body[data-theme="light"] .logo,
+.card h2,
+body[data-theme="light"] .card h2,
+.stat-card h3,
+body[data-theme="light"] .stat-card h3,
+footer h3,
+body[data-theme="light"] footer h3,
+.dashboard-settings-card h2,
+body[data-theme="light"] .dashboard-settings-card h2,
+.weekly-stat strong,
+body[data-theme="light"] .weekly-stat strong,
+.weekly-chart-heading h3,
+body[data-theme="light"] .weekly-chart-heading h3 {
+    color: var(--ss-accent-light);
+}
+
+/* Buttons */
+
+button {
+    background: linear-gradient(
+        135deg,
+        var(--ss-accent),
+        var(--ss-accent-dark)
+    );
+}
+
+button:hover {
+    background: linear-gradient(
+        135deg,
+        var(--ss-accent-light),
+        var(--ss-accent)
+    );
+    box-shadow: 0 7px 22px var(--ss-accent-glow);
+}
+
+/* Navigation */
+
+.navbar nav a::after {
+    background: var(--ss-accent-light);
+}
+
+.navbar nav a:hover {
+    color: var(--ss-accent-light);
+}
+
+body[data-theme="light"] .navbar nav a:hover {
+    color: var(--ss-accent-dark);
+}
+
+/* Theme button */
+
+.theme-toggle {
+    border-color: var(--ss-accent);
+    background: var(--ss-accent-soft);
+}
+
+body[data-theme="light"] .theme-toggle {
+    background: var(--ss-accent-soft);
+    border-color: var(--ss-accent);
+}
+
+/* Welcome section */
+
+.welcome {
+    border-color: var(--ss-accent);
+    background: linear-gradient(
+        135deg,
+        var(--ss-accent-soft),
+        rgba(79,70,229,0.12)
+    );
+}
+
+.daily-quote {
+    border-left-color: var(--ss-accent-light);
+}
+
+/* Dashboard cards */
+
+.stat-card {
+    border-color: var(--ss-accent-soft);
+}
+
+.stat-card:hover,
+.card:hover {
+    border-color: var(--ss-accent);
+    box-shadow: 0 12px 30px var(--ss-accent-glow);
+}
+
+/* Study timer */
+
+.timer-display,
+body[data-theme="light"] .timer-display {
+    color: var(--ss-accent-light);
+    text-shadow: 0 0 20px var(--ss-accent-glow);
+}
+
+.timer-ring {
+    background: conic-gradient(
+        var(--ss-accent-light) var(--progress),
+        rgba(255,255,255,0.10) var(--progress)
+    );
+    box-shadow: 0 0 25px var(--ss-accent-glow);
+}
+
+body[data-theme="light"] .timer-ring {
+    background: conic-gradient(
+        var(--ss-accent) var(--progress),
+        #e3ddef var(--progress)
+    );
+}
+
+/* Weekly analytics chart */
+
+.chart-bar {
+    background: linear-gradient(
+        180deg,
+        var(--ss-accent-light),
+        var(--ss-accent-dark)
+    );
+    box-shadow: 0 0 18px var(--ss-accent-glow);
+}
+
+/* Checkboxes */
+
+input[type="checkbox"] {
+    accent-color: var(--ss-accent);
+}
+
+/* Dashboard customisation panel */
+
+.dashboard-settings-card {
+    border-color: var(--ss-accent-soft);
+}
+
+.dashboard-visibility-option:hover {
+    border-color: var(--ss-accent);
+    background: var(--ss-accent-soft);
+}
+
+.dashboard-visibility-option input {
+    accent-color: var(--ss-accent);
+}
+
+/* Accent colour selection panel */
+
+.accent-settings-heading {
+    color: var(--ss-accent-light);
+    font-size: 20px;
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+body[data-theme="light"] .accent-settings-heading {
+    color: var(--ss-accent-dark);
+}
+
+.accent-settings-description {
+    color: #bcb8d6;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+body[data-theme="light"] .accent-settings-description {
+    color: #625879;
+}
+
+.accent-colour-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.accent-colour-option {
+    background: rgba(255,255,255,0.06);
+    border: 2px solid transparent;
+    color: white;
+    min-width: 95px;
+    padding: 12px 18px;
+    border-radius: 12px;
+    position: relative;
+}
+
+.accent-colour-option::before {
+    content: "";
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background: var(--swatch-colour);
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.accent-colour-option.selected {
+    border-color: var(--swatch-colour);
+    background: var(--ss-accent-soft);
+    box-shadow: 0 0 12px var(--ss-accent-glow);
+}
+
+body[data-theme="light"] .accent-colour-option {
+    color: #302a43;
+    background: #f4f0fa;
+}
+
+.accent-settings-status {
+    min-height: 20px;
+    margin-top: 12px;
+    color: #b9f6cf;
+    font-size: 13px;
+}
+
+body[data-theme="light"] .accent-settings-status {
+    color: #247344;
+}
+
+@media (max-width: 600px) {
+    .accent-colour-picker {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .accent-colour-option {
+        min-width: 0;
+    }
+}
