@@ -1092,3 +1092,178 @@ if (studentNameInput) {
 
 // Restore the saved name whenever StudySpace opens.
 updatePersonalGreeting();
+
+/* =========================================
+   STAGE 3 - DASHBOARD CUSTOMISATION
+   SHOW / HIDE DASHBOARD CARDS
+========================================= */
+
+(function initialiseDashboardCustomisation() {
+    const settingsStorageKey = "studyspace_dashboard_visibility";
+
+    // Each selector points to an existing StudySpace section.
+    const dashboardSections = [
+        {
+            key: "dailyStats",
+            label: "Daily Statistics",
+            selector: ".stats"
+        },
+        {
+            key: "dailyGoals",
+            label: "Daily Goals",
+            selector: "#goalInput"
+        },
+        {
+            key: "studyTimer",
+            label: "Study Timer",
+            selector: "#timerRing"
+        },
+        {
+            key: "weeklyAnalytics",
+            label: "Weekly Analytics",
+            selector: "#weeklyChart"
+        },
+        {
+            key: "examCountdown",
+            label: "Exam Countdown",
+            selector: "#examName"
+        }
+    ];
+
+    // Load saved choices. If storage is empty or invalid, show everything.
+    let savedVisibility = {};
+
+    try {
+        savedVisibility = JSON.parse(
+            localStorage.getItem(settingsStorageKey)
+        ) || {};
+    } catch (error) {
+        savedVisibility = {};
+    }
+
+    // Find the outer card that contains a feature.
+    function findSectionContainer(selector) {
+        const element = document.querySelector(selector);
+
+        if (!element) {
+            return null;
+        }
+
+        if (element.matches(".stats")) {
+            return element;
+        }
+
+        return element.closest(".card, section") || element.parentElement;
+    }
+
+    // Create the customisation panel without requiring changes to index.html.
+    const settingsCard = document.createElement("section");
+    settingsCard.className = "dashboard-settings-card";
+    settingsCard.id = "dashboardCustomisation";
+    settingsCard.setAttribute("aria-labelledby", "dashboardSettingsTitle");
+
+    const heading = document.createElement("h2");
+    heading.id = "dashboardSettingsTitle";
+    heading.textContent = "⚙️ Customise Your Dashboard";
+
+    const description = document.createElement("p");
+    description.className = "dashboard-settings-description";
+    description.textContent =
+        "Choose which sections you want to see. Your preferences are saved automatically.";
+
+    const optionsContainer = document.createElement("div");
+    optionsContainer.className = "dashboard-visibility-options";
+
+    const statusMessage = document.createElement("p");
+    statusMessage.className = "dashboard-settings-status";
+    statusMessage.setAttribute("aria-live", "polite");
+
+    const resetButton = document.createElement("button");
+    resetButton.type = "button";
+    resetButton.className = "dashboard-reset-button";
+    resetButton.textContent = "Show All Sections";
+
+    dashboardSections.forEach(function (section) {
+        const sectionContainer = findSectionContainer(section.selector);
+
+        // Skip a section if it is not present in the current HTML.
+        if (!sectionContainer) {
+            return;
+        }
+
+        if (!sectionContainer.id) {
+            sectionContainer.id = "studyspace-section-" + section.key;
+        }
+
+        const optionLabel = document.createElement("label");
+        optionLabel.className = "dashboard-visibility-option";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = savedVisibility[section.key] !== false;
+        checkbox.setAttribute("aria-controls", sectionContainer.id);
+
+        const optionText = document.createElement("span");
+        optionText.textContent = section.label;
+
+        optionLabel.appendChild(checkbox);
+        optionLabel.appendChild(optionText);
+        optionsContainer.appendChild(optionLabel);
+
+        // Apply the saved visibility setting.
+        sectionContainer.hidden = !checkbox.checked;
+
+        checkbox.addEventListener("change", function () {
+            sectionContainer.hidden = !checkbox.checked;
+
+            savedVisibility[section.key] = checkbox.checked;
+
+            localStorage.setItem(
+                settingsStorageKey,
+                JSON.stringify(savedVisibility)
+            );
+
+            statusMessage.textContent =
+                section.label + (checkbox.checked ? " is now visible." : " is now hidden.");
+        });
+    });
+
+    resetButton.addEventListener("click", function () {
+        savedVisibility = {};
+
+        localStorage.removeItem(settingsStorageKey);
+
+        const checkboxes = optionsContainer.querySelectorAll(
+            'input[type="checkbox"]'
+        );
+
+        checkboxes.forEach(function (checkbox) {
+            checkbox.checked = true;
+
+            const targetId = checkbox.getAttribute("aria-controls");
+            const targetSection = document.getElementById(targetId);
+
+            if (targetSection) {
+                targetSection.hidden = false;
+            }
+        });
+
+        statusMessage.textContent = "All dashboard sections are visible again.";
+    });
+
+    settingsCard.appendChild(heading);
+    settingsCard.appendChild(description);
+    settingsCard.appendChild(optionsContainer);
+    settingsCard.appendChild(resetButton);
+    settingsCard.appendChild(statusMessage);
+
+    // Place the settings panel just below the welcome area.
+    const welcome = document.querySelector(".welcome");
+
+    if (welcome) {
+        welcome.insertAdjacentElement("afterend", settingsCard);
+    } else {
+        const container = document.querySelector(".container") || document.body;
+        container.insertBefore(settingsCard, container.firstChild);
+    }
+})();
