@@ -1026,3 +1026,62 @@ if (themeToggle) {
         localStorage.setItem("studyspace_theme", nextTheme);
     });
 }
+
+
+/* =========================================
+   STAGE 3 - PERSONALISED WELCOME GREETING
+========================================= */
+
+const studentNameInput = document.getElementById("studentNameInput");
+const saveStudentNameButton = document.getElementById("saveStudentName");
+const welcomeTitle = document.getElementById("welcomeTitle");
+const nameSaveMessage = document.getElementById("nameSaveMessage");
+const studentNameStorageKey = "studyspace_student_name";
+
+function updatePersonalGreeting() {
+    const savedName = localStorage.getItem(studentNameStorageKey) || "";
+    const displayName = savedName.trim() || "Student";
+
+    if (welcomeTitle) {
+        welcomeTitle.textContent = "Welcome Back, " + displayName + "! 👋";
+    }
+
+    if (studentNameInput) {
+        studentNameInput.value = savedName;
+    }
+}
+
+function savePersonalName() {
+    if (!studentNameInput) return;
+
+    const enteredName = studentNameInput.value.trim();
+
+    if (enteredName.length === 0) {
+        localStorage.removeItem(studentNameStorageKey);
+        if (nameSaveMessage) {
+            nameSaveMessage.textContent = "Name cleared. Showing the default greeting.";
+        }
+    } else {
+        localStorage.setItem(studentNameStorageKey, enteredName);
+        if (nameSaveMessage) {
+            nameSaveMessage.textContent = "Your name has been saved!";
+        }
+    }
+
+    updatePersonalGreeting();
+}
+
+if (saveStudentNameButton) {
+    saveStudentNameButton.addEventListener("click", savePersonalName);
+}
+
+if (studentNameInput) {
+    studentNameInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            savePersonalName();
+        }
+    });
+}
+
+// Restore the saved name whenever StudySpace opens.
+updatePersonalGreeting();
