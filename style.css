@@ -2455,3 +2455,132 @@ body.focus-mode-open {
         animation: none !important;
     }
 }
+
+/* =========================================
+   STUDY SESSION HISTORY - PREMIUM STYLING
+========================================= */
+
+.session-history-card {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Summary section */
+
+.session-history-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin: 25px 0;
+}
+
+.session-history-summary .weekly-stat {
+    padding: 22px;
+    border-radius: 16px;
+    background: rgba(130, 100, 220, 0.13);
+    border: 1px solid rgba(180, 160, 255, 0.18);
+    transition: transform 0.3s ease,
+                background 0.3s ease;
+}
+
+.session-history-summary .weekly-stat:hover {
+    transform: translateY(-4px);
+    background: rgba(130, 100, 220, 0.22);
+}
+
+.session-history-summary .weekly-stat-label {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.session-history-summary .weekly-stat strong {
+    font-size: 26px;
+    color: var(--accent-color);
+}
+
+/* Recent sessions heading */
+
+.session-history-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin: 25px 0 15px;
+}
+
+.session-history-heading h3 {
+    margin: 0;
+    font-size: 20px;
+}
+
+#historySessionCount {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+/* Individual session cards */
+
+.session-history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    border-radius: 14px;
+    background: rgba(120, 100, 200, 0.12);
+    border: 1px solid rgba(180, 160, 255, 0.16);
+    transition: all 0.3s ease;
+}
+
+.session-history-item:hover {
+    transform: translateX(5px);
+    background: rgba(120, 100, 200, 0.22);
+    border-color: var(--accent-color);
+}
+
+.session-history-item strong {
+    color: var(--accent-color);
+    font-size: 16px;
+}
+
+.session-history-item p {
+    margin: 7px 0 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+/* Empty history message */
+
+.empty-session-history {
+    text-align: center;
+    padding: 25px 15px;
+    color: var(--text-secondary);
+    border-radius: 14px;
+    background: rgba(120, 100, 200, 0.08);
+}
+
+/* Mobile responsive design */
+
+@media (max-width: 600px) {
+
+    .session-history-summary {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .session-history-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .session-history-item {
+        padding: 15px;
+    }
+
+    .session-history-summary .weekly-stat strong {
+        font-size: 23px;
+    }
+}
