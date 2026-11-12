@@ -139,7 +139,7 @@ document.addEventListener("DOMContentLoaded", function () {
         button.type = "button";
         button.className = "accent-colour-button";
         button.textContent = colour.name;
-        button.style.backgroundColor = colour.main;
+        button.style.setProperty("background-color", colour.main, "important");
         button.style.color = "#ffffff";
 
         button.addEventListener("click", function () {
