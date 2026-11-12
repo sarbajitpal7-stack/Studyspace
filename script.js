@@ -74,6 +74,9 @@ function saveDailyData() {
         storageKey,
         JSON.stringify(dailyData)
     );
+
+    // Refresh weekly analytics whenever today's data changes.
+    renderWeeklyAnalytics();
 }
 
 
@@ -815,3 +818,175 @@ displayTimer();
 displayExams();
 
 updateStats();
+
+/* =========================================
+   STAGE 2 - WEEKLY STUDY ANALYTICS
+========================================= */
+
+// Use the same date-key format as the existing daily storage.
+function getStudySpaceDateKey(date) {
+    return date.toLocaleDateString("en-CA");
+}
+
+// Read one day's saved information. Missing days count as zero.
+function getStudySpaceDayData(date) {
+    const key = "studyspace_" + getStudySpaceDateKey(date);
+
+    try {
+        const savedData = JSON.parse(localStorage.getItem(key));
+        return savedData || { goals: [], studySeconds: 0, sessions: 0 };
+    } catch (error) {
+        return { goals: [], studySeconds: 0, sessions: 0 };
+    }
+}
+
+function formatStudyDuration(seconds) {
+    const totalMinutes = Math.floor(seconds / 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    if (hours > 0) {
+        return hours + " hr " + minutes + " min";
+    }
+
+    return totalMinutes + " min";
+}
+
+function renderWeeklyAnalytics() {
+    const chart = document.getElementById("weeklyChart");
+    if (!chart) return;
+
+    const weeklyDays = [];
+    const today = new Date();
+
+    // Collect today and the previous six calendar days.
+    for (let offset = 6; offset >= 0; offset--) {
+        const date = new Date(today);
+        date.setHours(0, 0, 0, 0);
+        date.setDate(today.getDate() - offset);
+
+        const data = getStudySpaceDayData(date);
+        const studySeconds = Number(data.studySeconds) || 0;
+        const goals = Array.isArray(data.goals) ? data.goals : [];
+        const completedGoals = goals.filter(goal => goal && goal.completed).length;
+        const sessions = Number(data.sessions) || 0;
+
+        weeklyDays.push({
+            date: date,
+            label: date.toLocaleDateString("en-IN", { weekday: "short" }),
+            studySeconds: studySeconds,
+            completedGoals: completedGoals,
+            totalGoals: goals.length,
+            sessions: sessions
+        });
+    }
+
+    const totalStudySeconds = weeklyDays.reduce(
+        (total, day) => total + day.studySeconds, 0
+    );
+    const totalCompletedGoals = weeklyDays.reduce(
+        (total, day) => total + day.completedGoals, 0
+    );
+    const totalGoals = weeklyDays.reduce(
+        (total, day) => total + day.totalGoals, 0
+    );
+    const totalSessions = weeklyDays.reduce(
+        (total, day) => total + day.sessions, 0
+    );
+
+    const goalPercentage = totalGoals > 0
+        ? Math.round((totalCompletedGoals / totalGoals) * 100)
+        : 0;
+
+    document.getElementById("weeklyStudyTime").textContent =
+        formatStudyDuration(totalStudySeconds);
+
+    document.getElementById("weeklyGoals").textContent =
+        goalPercentage + "%";
+
+    document.getElementById("weeklySessions").textContent =
+        totalSessions;
+
+    // Find the day with the most recorded study time.
+    const mostProductiveDay = weeklyDays.reduce((best, day) => {
+        return day.studySeconds > best.studySeconds ? day : best;
+    }, weeklyDays[0]);
+
+    const productiveDayElement = document.getElementById("productiveDay");
+
+    if (totalStudySeconds === 0) {
+        productiveDayElement.textContent = "Not yet available";
+    } else {
+        productiveDayElement.textContent =
+            mostProductiveDay.label + " (" +
+            formatStudyDuration(mostProductiveDay.studySeconds) + ")";
+    }
+
+    // Draw the seven-day bar chart.
+    const maximumStudySeconds = Math.max(
+        ...weeklyDays.map(day => day.studySeconds),
+        1
+    );
+
+    chart.innerHTML = "";
+
+    weeklyDays.forEach(day => {
+        const barColumn = document.createElement("div");
+        barColumn.className = "chart-column";
+
+        const barValue = document.createElement("span");
+        barValue.className = "chart-value";
+        barValue.textContent = day.studySeconds > 0
+            ? formatStudyDuration(day.studySeconds)
+            : "0 min";
+
+        const barTrack = document.createElement("div");
+        barTrack.className = "chart-bar-track";
+
+        const bar = document.createElement("div");
+        bar.className = "chart-bar";
+
+        const heightPercentage = day.studySeconds > 0
+            ? Math.max((day.studySeconds / maximumStudySeconds) * 100, 4)
+            : 0;
+
+        bar.style.height = heightPercentage + "%";
+        bar.setAttribute(
+            "aria-label",
+            day.label + ": " + formatStudyDuration(day.studySeconds)
+        );
+
+        if (getStudySpaceDateKey(day.date) === getStudySpaceDateKey(today)) {
+            bar.classList.add("today-bar");
+        }
+
+        barTrack.appendChild(bar);
+
+        const dayLabel = document.createElement("span");
+        dayLabel.className = "chart-day";
+        dayLabel.textContent = day.label;
+
+        barColumn.appendChild(barValue);
+        barColumn.appendChild(barTrack);
+        barColumn.appendChild(dayLabel);
+        chart.appendChild(barColumn);
+    });
+
+    // Write a short summary based on the saved weekly figures.
+    const summary = document.getElementById("weeklySummary");
+
+    if (totalStudySeconds === 0 && totalGoals === 0 && totalSessions === 0) {
+        summary.textContent =
+            "Your weekly summary will appear here as you study. Start a focus session to begin tracking your progress!";
+    } else {
+        summary.textContent =
+            "Over the last seven days, you studied for " +
+            formatStudyDuration(totalStudySeconds) +
+            ", completed " + totalCompletedGoals + " of " + totalGoals +
+            " goals (" + goalPercentage + "%), and finished " +
+            totalSessions + " focus sessions.";
+    }
+}
+
+// Render analytics when the page first opens.
+renderWeeklyAnalytics();
