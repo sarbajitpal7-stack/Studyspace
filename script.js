@@ -5,7 +5,7 @@
 
 
 /* =================================
-   DATE AND MOTIVATIONAL QUOTE
+   DATE AND DAILY MOTIVATIONAL QUOTE
 ================================= */
 
 const today = new Date();
@@ -27,28 +27,35 @@ const quotes = [
     "Believe in yourself and keep learning.",
     "Your future is created by what you do today.",
     "Stay focused and never stop improving.",
-    "Every day is a new opportunity to learn."
+    "Every day is a new opportunity to learn.",
+    "Success is the sum of small efforts repeated daily.",
+    "Don't stop when you're tired. Stop when you're done.",
+    "A little progress each day adds up to big results.",
+    "Your only limit is the effort you are willing to make.",
+    "Dream big, start small, and keep going."
 ];
+
+// Use the local calendar date to choose one quote.
+// The quote stays the same all day, even after refreshing.
+const localDateNumber = Math.floor(
+    Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) /
+    (1000 * 60 * 60 * 24)
+);
+
+const quoteIndex =
+    ((localDateNumber % quotes.length) + quotes.length) % quotes.length;
 
 const welcomeSection = document.querySelector(".welcome");
 
 if (welcomeSection) {
     const dateElement = document.createElement("p");
-
+    dateElement.className = "welcome-date";
     dateElement.textContent = "📅 " + currentDate;
-    dateElement.style.marginTop = "18px";
-
     welcomeSection.appendChild(dateElement);
 
     const quoteElement = document.createElement("p");
-
-    quoteElement.textContent =
-        "✨ " + quotes[
-            Math.floor(Math.random() * quotes.length)
-        ];
-
-    quoteElement.style.marginTop = "12px";
-
+    quoteElement.className = "daily-quote";
+    quoteElement.textContent = "✨ " + quotes[quoteIndex];
     welcomeSection.appendChild(quoteElement);
 }
 
