@@ -1461,3 +1461,65 @@ body[data-theme="light"] .timer-ring {
         margin-top: 2px;
     }
 }
+
+
+/* =========================================
+   STAGE 3 - PERSONALISED WELCOME GREETING
+========================================= */
+
+.personal-name-row {
+    margin-top: 20px;
+    max-width: 420px;
+}
+
+.personal-name-row label {
+    display: block;
+    margin-bottom: 8px;
+    color: #d8d0f0;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.personal-name-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.personal-name-controls input {
+    min-width: 0;
+    flex: 1;
+    margin: 0;
+}
+
+.personal-name-controls button {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.name-save-message {
+    display: block;
+    min-height: 18px;
+    margin-top: 6px;
+    color: #b9f6cf;
+    font-size: 0.8rem;
+}
+
+body[data-theme="light"] .personal-name-row label {
+    color: #51436f;
+}
+
+body[data-theme="light"] .name-save-message {
+    color: #247344;
+}
+
+@media (max-width: 480px) {
+    .personal-name-controls {
+        align-items: stretch;
+    }
+
+    .personal-name-controls button {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+}
