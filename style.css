@@ -2152,3 +2152,143 @@ body.focus-mode-open {
         animation: none !important;
     }
 }
+
+/* ==========================================
+   STUDYSPACE - BEAUTIFUL AMBIENT ANIMATIONS
+========================================== */
+
+.timer-card.focus-mode-active {
+    position: fixed !important;
+    isolation: isolate;
+    overflow: hidden;
+    transition: background 0.8s ease;
+}
+
+/* Keep animated effects above the background */
+.timer-card.focus-mode-active::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+/* Keep timer and controls above animations */
+.timer-card.focus-mode-active > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* ==========================================
+   COSMIC NIGHT - TWINKLING STARS
+========================================== */
+
+.timer-card.focus-mode-active[data-environment="cosmic"]::before {
+    background-image:
+        radial-gradient(2px 2px at 10% 20%, white 90%, transparent),
+        radial-gradient(3px 3px at 25% 70%, #c4b5fd 90%, transparent),
+        radial-gradient(2px 2px at 45% 35%, white 90%, transparent),
+        radial-gradient(3px 3px at 65% 15%, #a5b4fc 90%, transparent),
+        radial-gradient(2px 2px at 80% 60%, white 90%, transparent),
+        radial-gradient(3px 3px at 92% 85%, #ddd6fe 90%, transparent),
+        radial-gradient(2px 2px at 35% 90%, white 90%, transparent);
+    background-size: 350px 350px;
+    animation: cosmicStars 8s ease-in-out infinite alternate;
+}
+
+@keyframes cosmicStars {
+    0% {
+        opacity: 0.25;
+        background-position: 0 0;
+    }
+    50% {
+        opacity: 0.9;
+    }
+    100% {
+        opacity: 0.5;
+        background-position: 40px 60px;
+    }
+}
+
+/* ==========================================
+   RAINY WINDOW - MOVING RAIN
+========================================== */
+
+.timer-card.focus-mode-active[data-environment="rain"]::before {
+    background-image:
+        repeating-linear-gradient(
+            105deg,
+            transparent 0px,
+            transparent 12px,
+            rgba(200, 225, 255, 0.30) 13px,
+            transparent 15px,
+            transparent 25px
+        ),
+        radial-gradient(
+            ellipse at 50% 20%,
+            rgba(100, 160, 210, 0.2),
+            transparent 65%
+        );
+    background-size: 100% 100%;
+    animation: rainFall 1.5s linear infinite;
+}
+
+@keyframes rainFall {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: -35px 100px;
+    }
+}
+
+/* ==========================================
+   NATURE RETREAT - FLOATING LIGHTS
+========================================== */
+
+.timer-card.focus-mode-active[data-environment="nature"]::before {
+    background-image:
+        radial-gradient(circle at 15% 25%, rgba(160, 255, 190, 0.35), transparent 13%),
+        radial-gradient(circle at 75% 30%, rgba(190, 255, 210, 0.25), transparent 16%),
+        radial-gradient(circle at 40% 75%, rgba(120, 230, 160, 0.25), transparent 18%),
+        radial-gradient(circle at 90% 85%, rgba(180, 255, 200, 0.25), transparent 12%);
+    background-size: 150% 150%;
+    animation: natureBreeze 9s ease-in-out infinite alternate;
+}
+
+@keyframes natureBreeze {
+    0% {
+        opacity: 0.3;
+        background-position: 0% 0%;
+    }
+    100% {
+        opacity: 0.95;
+        background-position: 100% 100%;
+    }
+}
+
+/* ==========================================
+   TIMER CARD - SOFT ENTRANCE
+========================================== */
+
+.timer-card.focus-mode-active .timer-ring {
+    animation: timerGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes timerGlow {
+    from {
+        filter: drop-shadow(0 0 5px rgba(167, 139, 250, 0.2));
+    }
+    to {
+        filter: drop-shadow(0 0 18px rgba(167, 139, 250, 0.55));
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .timer-card.focus-mode-active::before,
+    .timer-card.focus-mode-active .timer-ring {
+        animation: none !important;
+    }
+}
