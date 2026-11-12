@@ -1267,3 +1267,149 @@ updatePersonalGreeting();
         container.insertBefore(settingsCard, container.firstChild);
     }
 })();
+
+/* =========================================
+   STAGE 4 - CUSTOM ACCENT COLOURS
+========================================= */
+
+(function initialiseAccentColours() {
+
+    const settingsCard = document.getElementById(
+        "dashboardCustomisation"
+    );
+
+    if (!settingsCard) return;
+
+    const storageKey = "studyspace_accent_colour";
+
+    const colours = [
+        {
+            name: "Purple",
+            main: "#9565ff",
+            light: "#c4a5ff",
+            dark: "#7045f5",
+            soft: "rgba(149,101,255,0.16)",
+            glow: "rgba(149,101,255,0.30)"
+        },
+        {
+            name: "Blue",
+            main: "#3b82f6",
+            light: "#93c5fd",
+            dark: "#2563eb",
+            soft: "rgba(59,130,246,0.16)",
+            glow: "rgba(59,130,246,0.30)"
+        },
+        {
+            name: "Green",
+            main: "#10b981",
+            light: "#6ee7b7",
+            dark: "#059669",
+            soft: "rgba(16,185,129,0.16)",
+            glow: "rgba(16,185,129,0.30)"
+        },
+        {
+            name: "Orange",
+            main: "#f97316",
+            light: "#fdba74",
+            dark: "#ea580c",
+            soft: "rgba(249,115,22,0.16)",
+            glow: "rgba(249,115,22,0.30)"
+        },
+        {
+            name: "Pink",
+            main: "#ec4899",
+            light: "#f9a8d4",
+            dark: "#db2777",
+            soft: "rgba(236,72,153,0.16)",
+            glow: "rgba(236,72,153,0.30)"
+        }
+    ];
+
+    const root = document.documentElement;
+
+    const heading = document.createElement("h3");
+    heading.className = "accent-settings-heading";
+    heading.textContent = "🎨 Custom Accent Colours";
+
+    const description = document.createElement("p");
+    description.className = "accent-settings-description";
+    description.textContent =
+        "Choose your favourite colour to personalise your dashboard.";
+
+    const picker = document.createElement("div");
+    picker.className = "accent-colour-picker";
+    picker.setAttribute("role", "group");
+    picker.setAttribute("aria-label", "Choose accent colour");
+
+    const status = document.createElement("p");
+    status.className = "accent-settings-status";
+    status.setAttribute("aria-live", "polite");
+
+    function applyAccentColour(colour, save = true) {
+
+        root.style.setProperty("--ss-accent", colour.main);
+        root.style.setProperty("--ss-accent-light", colour.light);
+        root.style.setProperty("--ss-accent-dark", colour.dark);
+        root.style.setProperty("--ss-accent-soft", colour.soft);
+        root.style.setProperty("--ss-accent-glow", colour.glow);
+
+        if (save) {
+            localStorage.setItem(storageKey, colour.name);
+        }
+
+        picker.querySelectorAll("button").forEach(button => {
+
+            const selected = button.dataset.colour === colour.name;
+
+            button.classList.toggle("selected", selected);
+
+            button.setAttribute(
+                "aria-pressed",
+                String(selected)
+            );
+
+        });
+
+        status.textContent = colour.name + " accent colour selected!";
+    }
+
+    colours.forEach(colour => {
+
+        const button = document.createElement("button");
+
+        button.type = "button";
+        button.className = "accent-colour-option";
+        button.dataset.colour = colour.name;
+
+        button.style.setProperty("--swatch-colour", colour.main);
+
+        button.textContent = colour.name;
+
+        button.setAttribute(
+            "aria-label",
+            "Select " + colour.name + " accent colour"
+        );
+
+        button.addEventListener("click", function () {
+            applyAccentColour(colour);
+        });
+
+        picker.appendChild(button);
+
+    });
+
+    settingsCard.appendChild(heading);
+    settingsCard.appendChild(description);
+    settingsCard.appendChild(picker);
+    settingsCard.appendChild(status);
+
+    // Restore the previously selected colour.
+    const savedColour = localStorage.getItem(storageKey);
+
+    const selectedColour =
+        colours.find(colour => colour.name === savedColour)
+        || colours[0];
+
+    applyAccentColour(selectedColour, false);
+
+})();
