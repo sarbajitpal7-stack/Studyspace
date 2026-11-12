@@ -26,8 +26,16 @@
         <section class="welcome">
             <div>
                 <p class="small-heading">YOUR PERSONAL STUDY SPACE</p>
-                <h1>Welcome Back, Student! 👋</h1>
+                <h1 id="welcomeTitle">Welcome Back, Student! 👋</h1>
                 <p>Plan your day, stay focused and achieve your goals.</p>
+                <div class="personal-name-row">
+                    <label for="studentNameInput">Personalise your dashboard:</label>
+                    <div class="personal-name-controls">
+                        <input type="text" id="studentNameInput" maxlength="24" placeholder="Enter your name" autocomplete="given-name">
+                        <button id="saveStudentName" type="button">Save Name</button>
+                    </div>
+                    <span id="nameSaveMessage" class="name-save-message" aria-live="polite"></span>
+                </div>
             </div>
         </section>
 
