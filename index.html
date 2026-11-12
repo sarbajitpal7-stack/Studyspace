@@ -1,206 +1,147 @@
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StudySpace | Student Dashboard</title>
-
     <link rel="stylesheet" href="style.css">
-
 </head>
-
 <body>
-
     <!-- Navigation Bar -->
-
     <header class="navbar">
-
         <h2 class="logo">StudySpace 🌙</h2>
-
         <nav>
             <a href="#home">Home</a>
             <a href="#goals">Daily Goals</a>
             <a href="#timer">Study Timer</a>
+            <a href="#analytics">Weekly Analytics</a>
             <a href="#exam">Exam Countdown</a>
         </nav>
-
     </header>
 
-
     <!-- Main Dashboard -->
-
     <main class="container" id="home">
-
-
         <!-- Welcome Section -->
-
         <section class="welcome">
-
             <div>
                 <p class="small-heading">YOUR PERSONAL STUDY SPACE</p>
-
                 <h1>Welcome Back, Student! 👋</h1>
-
                 <p>Plan your day, stay focused and achieve your goals.</p>
             </div>
-
         </section>
 
+        <!-- Daily Statistics -->
+        <section class="stats">
+            <div class="stat-card">
+                <h3>📚 Study Time</h3>
+                <p id="totalStudy">0 min</p>
+                <span>Total study time today</span>
+            </div>
+            <div class="stat-card">
+                <h3>🎯 Goals Completed</h3>
+                <p id="completedGoals">0</p>
+                <span>Tasks completed today</span>
+            </div>
+            <div class="stat-card">
+                <h3>🔥 Focus Sessions</h3>
+                <p id="sessions">0</p>
+                <span>Pomodoro sessions completed</span>
+            </div>
+        </section>
 
-        <!-- Statistics Section -->
+        <!-- Weekly Study Analytics -->
+        <section class="card analytics-card" id="analytics">
+            <h2>📊 Weekly Study Analytics</h2>
+            <p>Your study activity over the last seven days.</p>
 
-       
-<!-- Statistics Section -->
+            <div class="weekly-summary-grid">
+                <div class="weekly-stat">
+                    <span class="weekly-stat-label">Total study time</span>
+                    <strong id="weeklyStudyTime">0 min</strong>
+                </div>
+                <div class="weekly-stat">
+                    <span class="weekly-stat-label">Goals completed</span>
+                    <strong id="weeklyGoals">0%</strong>
+                </div>
+                <div class="weekly-stat">
+                    <span class="weekly-stat-label">Focus sessions</span>
+                    <strong id="weeklySessions">0</strong>
+                </div>
+                <div class="weekly-stat">
+                    <span class="weekly-stat-label">Most productive day</span>
+                    <strong id="productiveDay">Not yet available</strong>
+                </div>
+            </div>
 
-<section class="stats">
-
-    <div class="stat-card">
-        <h3>📚 Study Time</h3>
-        <p id="totalStudy">0 min</p>
-        <span>Total study time today</span>
-    </div>
-
-    <div class="stat-card">
-        <h3>🎯 Goals Completed</h3>
-        <p id="completedGoals">0</p>
-        <span>Tasks completed today</span>
-    </div>
-
-    <div class="stat-card">
-        <h3>🔥 Focus Sessions</h3>
-        <p id="sessions">0</p>
-        <span>Pomodoro sessions completed</span>
-    </div>
-
-</section>
-
-
+            <div class="weekly-chart-heading">
+                <h3>Daily study time</h3>
+                <span>Last 7 days</span>
+            </div>
+            <div class="weekly-chart" id="weeklyChart" role="img" aria-label="Bar chart showing daily study time for the last seven days"></div>
+            <p class="weekly-summary" id="weeklySummary" aria-live="polite">
+                Your weekly summary will appear here as you study.
+            </p>
+            <p class="analytics-note">
+                Study time is recorded by your StudySpace timer. Days without recorded activity appear as zero.
+            </p>
+        </section>
 
         <!-- Daily Goals -->
-
         <section class="card" id="goals">
-
             <h2>🎯 Daily Goals</h2>
-
             <p>Make a plan and complete your daily tasks.</p>
-
             <div class="goal-input">
-
-                <input
-                    type="text"
-                    id="goalInput"
-                    placeholder="Enter your study goal..."
-                >
-
+                <input type="text" id="goalInput" placeholder="Enter your study goal...">
                 <button id="addGoal">Add Goal +</button>
-
             </div>
-
             <ul id="goalList"></ul>
-
         </section>
 
-
-        
-<!-- Study Timer -->
-
-<section class="card timer-card" id="timer">
-
-    <h2>⏱ Study Timer</h2>
-
-    <p>Focus on your studies, one session at a time.</p>
-
-    <div class="timer-ring" id="timerRing">
-
-        <div class="timer-center">
-
-            <p class="timer-mode" id="timerMode">
-                FOCUS MODE
-            </p>
-
-            <div class="timer-display" id="timerDisplay"
-                 aria-live="off">
-                25:00
+        <!-- Study Timer -->
+        <section class="card timer-card" id="timer">
+            <h2>⏱ Study Timer</h2>
+            <p>Focus on your studies, one session at a time.</p>
+            <div class="timer-ring" id="timerRing">
+                <div class="timer-center">
+                    <p class="timer-mode" id="timerMode">FOCUS MODE</p>
+                    <div class="timer-display" id="timerDisplay" aria-live="off">25:00</div>
+                    <span class="timer-subtitle">Stay focused</span>
+                </div>
             </div>
-
-            <span class="timer-subtitle">
-                Stay focused
-            </span>
-
-        </div>
-
-    </div>
-
-    <div class="timer-buttons">
-
-        <button id="startTimer">▶ Start</button>
-
-        <button id="pauseTimer">Ⅱ Pause</button>
-
-        <button id="resetTimer">↻ Reset</button>
-
-    </div>
-
-    <p class="timer-note" id="timerNote">
-        25 minutes study • 5 minutes break
-    </p>
-
-</section>
-
-
+            <div class="timer-buttons">
+                <button id="startTimer">▶ Start</button>
+                <button id="pauseTimer">Ⅱ Pause</button>
+                <button id="resetTimer">↻ Reset</button>
+            </div>
+            <p class="timer-note" id="timerNote">25 minutes study • 5 minutes break</p>
+        </section>
 
         <!-- Exam Countdown -->
-
-
-<section class="card" id="exam">
-    <h2>📅 Exam Countdown</h2>
-    <p>Never lose track of your upcoming examinations.</p>
-
-    <input
-        type="text"
-        id="examName"
-        placeholder="Enter exam name (e.g. Physics)"
-    >
-
-    <input type="date" id="examDate">
-
-    <select id="examColor">
-        <option value="#8b5cf6">🟣 Purple</option>
-        <option value="#3b82f6">🔵 Blue</option>
-        <option value="#22c55e">🟢 Green</option>
-        <option value="#f59e0b">🟠 Orange</option>
-        <option value="#ec4899">🩷 Pink</option>
-        <option value="#ef4444">🔴 Red</option>
-    </select>
-
-    <button id="saveExam">＋ Add Exam</button>
-
-    <div id="examResult">
-        No upcoming exam added yet.
-    </div>
-</section>
-
-
+        <section class="card" id="exam">
+            <h2>📅 Exam Countdown</h2>
+            <p>Never lose track of your upcoming examinations.</p>
+            <input type="text" id="examName" placeholder="Enter exam name (e.g. Physics)">
+            <input type="date" id="examDate">
+            <select id="examColor">
+                <option value="#8b5cf6">🟣 Purple</option>
+                <option value="#3b82f6">🔵 Blue</option>
+                <option value="#22c55e">🟢 Green</option>
+                <option value="#f59e0b">🟠 Orange</option>
+                <option value="#ec4899">🩷 Pink</option>
+                <option value="#ef4444">🔴 Red</option>
+            </select>
+            <button id="saveExam">＋ Add Exam</button>
+            <div id="examResult">No upcoming exam added yet.</div>
+        </section>
+    </main>
 
     <!-- Footer -->
-
     <footer>
-
         <h3>StudySpace 🌙</h3>
-
         <p>Small Steps. Steady Focus. Better Progress.</p>
-
         <p>Made for students, with ❤️</p>
-
     </footer>
 
-
     <script src="script.js"></script>
-
 </body>
-
 </html>
