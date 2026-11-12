@@ -1531,22 +1531,106 @@ updatePersonalGreeting();
 
 })();
 
+
 /* =====================================
    STUDYSPACE - IMMERSIVE FOCUS MODE
 ===================================== */
 
 (function () {
+
     const timerCard = document.querySelector(".timer-card");
     const enterButton = document.getElementById("enterFocusMode");
+    const controls = document.getElementById("focusModeControls");
+    const exitButton = document.getElementById("exitFocusMode");
+    const environmentSelector =
+        document.querySelector(".environment-selector");
+    const environmentOptions =
+        document.querySelector(".environment-options");
 
-    if (!timerCard || !enterButton) {
-        console.error("Focus Mode: Timer card or button not found.");
+    if (
+        !timerCard ||
+        !enterButton ||
+        !controls ||
+        !exitButton ||
+        !environmentSelector ||
+        !environmentOptions
+    ) {
+        console.error("Focus Mode elements could not be found.");
         return;
     }
 
-    // Prevent adding the controls more than once.
-    if (timerCard.dataset.focusModeReady === "true") return;
-    timerCard.dataset.focusModeReady = "true";
+    // Reuse the elements already present in index.html.
+    controls.style.display = "none";
+
+    exitButton.classList.add("focus-mode-exit");
+    environmentSelector.classList.add("focus-environment");
+    environmentOptions.classList.add("focus-environment-options");
+
+    const environmentButtons =
+        environmentOptions.querySelectorAll(".environment-option");
+
+    function enterFocusMode() {
+        timerCard.classList.add("focus-mode-active");
+        document.body.classList.add("focus-mode-open");
+
+        controls.style.display = "block";
+        enterButton.style.display = "none";
+    }
+
+    function exitFocusMode() {
+        timerCard.classList.remove("focus-mode-active");
+        document.body.classList.remove("focus-mode-open");
+
+        controls.style.display = "none";
+        enterButton.style.display = "";
+    }
+
+    enterButton.addEventListener("click", enterFocusMode);
+    exitButton.addEventListener("click", exitFocusMode);
+
+    environmentButtons.forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const selectedEnvironment =
+                button.dataset.environment;
+
+            timerCard.dataset.environment = selectedEnvironment;
+
+            environmentButtons.forEach(function (item) {
+                item.classList.remove("selected", "active");
+                item.setAttribute("aria-pressed", "false");
+            });
+
+            button.classList.add("selected");
+            button.setAttribute("aria-pressed", "true");
+
+        });
+
+    });
+
+    // Start with Cosmic Night selected.
+    timerCard.dataset.environment = "cosmic";
+
+    environmentButtons.forEach(function (button) {
+        const selected = button.dataset.environment === "cosmic";
+        button.classList.toggle("selected", selected);
+        button.classList.toggle("active", selected);
+        button.setAttribute("aria-pressed", String(selected));
+    });
+
+    // Escape key exits Focus Mode.
+    document.addEventListener("keydown", function (event) {
+        if (
+            event.key === "Escape" &&
+            timerCard.classList.contains("focus-mode-active")
+        ) {
+            exitFocusMode();
+        }
+    });
+
+})();
+
 
     // Exit button
     const exitButton = document.createElement("button");
