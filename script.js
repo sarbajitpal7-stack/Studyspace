@@ -990,3 +990,39 @@ function renderWeeklyAnalytics() {
 
 // Render analytics when the page first opens.
 renderWeeklyAnalytics();
+
+
+/* =========================================
+   STAGE 3 - DARK / LIGHT THEME TOGGLE
+========================================= */
+
+const themeToggle = document.getElementById("themeToggle");
+const savedTheme = localStorage.getItem("studyspace_theme") || "dark";
+
+function applyStudySpaceTheme(theme) {
+    const selectedTheme = theme === "light" ? "light" : "dark";
+    document.body.setAttribute("data-theme", selectedTheme);
+
+    if (themeToggle) {
+        const isLight = selectedTheme === "light";
+        themeToggle.textContent = isLight ? "🌙 Dark Mode" : "☀️ Light Mode";
+        themeToggle.setAttribute("aria-pressed", String(isLight));
+        themeToggle.setAttribute(
+            "aria-label",
+            isLight ? "Switch to dark mode" : "Switch to light mode"
+        );
+    }
+}
+
+// Restore the user's last selected theme when the website opens.
+applyStudySpaceTheme(savedTheme);
+
+if (themeToggle) {
+    themeToggle.addEventListener("click", function () {
+        const currentTheme = document.body.getAttribute("data-theme") || "dark";
+        const nextTheme = currentTheme === "dark" ? "light" : "dark";
+
+        applyStudySpaceTheme(nextTheme);
+        localStorage.setItem("studyspace_theme", nextTheme);
+    });
+}
