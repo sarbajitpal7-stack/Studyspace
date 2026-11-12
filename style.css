@@ -2061,3 +2061,21 @@ body.focus-mode-open {
         right: 15px;
     }
 }
+
+/* Focus Mode controls visibility */
+#focusModeControls {
+    display: none;
+}
+
+.timer-card.focus-mode-active #focusModeControls {
+    display: block;
+}
+
+.timer-card.focus-mode-active .environment-selector {
+    margin-top: 25px;
+}
+
+.environment-option.selected {
+    background: rgba(139, 92, 246, 0.3);
+    border-color: #a78bfa;
+}
