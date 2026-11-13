@@ -2800,3 +2800,53 @@ body[data-theme="light"] #smartInsightsText p {
         animation: none !important;
     }
 }
+/* =========================================
+   STAGE 13 - SMOOTH SECTION ANIMATIONS
+========================================= */
+
+@keyframes sectionFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Smooth entrance for major dashboard sections */
+#quickNotes,
+#subjectTracker,
+#studyCalendar,
+#productivityInsights {
+    animation: sectionFadeIn 0.7s ease both;
+}
+
+/* Slightly stagger the section animations */
+#subjectTracker {
+    animation-delay: 0.1s;
+}
+
+#studyCalendar {
+    animation-delay: 0.2s;
+}
+
+#quickNotes {
+    animation-delay: 0.3s;
+}
+
+#productivityInsights {
+    animation-delay: 0.4s;
+}
+
+/* Accessibility: respect reduced-motion settings */
+@media (prefers-reduced-motion: reduce) {
+    #quickNotes,
+    #subjectTracker,
+    #studyCalendar,
+    #productivityInsights {
+        animation: none !important;
+    }
+}
