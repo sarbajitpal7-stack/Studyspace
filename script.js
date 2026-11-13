@@ -2804,3 +2804,560 @@ renderWeeklyAnalytics();
     renderSubjectTracker();
 
 })();
+
+/* =========================================
+   STAGE 11 - QUICK NOTES
+========================================= */
+
+(function initialiseQuickNotes() {
+
+    const storageKey = "studyspace_quick_notes";
+
+    let notes = [];
+
+    try {
+        notes = JSON.parse(localStorage.getItem(storageKey)) || [];
+    } catch (error) {
+        notes = [];
+    }
+
+    let editingNoteId = null;
+
+    function saveNotes() {
+        localStorage.setItem(storageKey, JSON.stringify(notes));
+    }
+
+    // Get subjects from Stage 10.
+    function getSubjects() {
+        try {
+            return JSON.parse(
+                localStorage.getItem("studyspace_subjects")
+            ) || [
+                "Physics",
+                "Chemistry",
+                "Mathematics",
+                "English",
+                "Computer Science"
+            ];
+        } catch (error) {
+            return [
+                "Physics",
+                "Chemistry",
+                "Mathematics",
+                "English",
+                "Computer Science"
+            ];
+        }
+    }
+
+    // Create the Quick Notes section.
+    const notesSection = document.createElement("section");
+
+    notesSection.className = "card quick-notes-card";
+    notesSection.id = "quickNotes";
+
+    notesSection.innerHTML = `
+        <h2>📝 Quick Notes</h2>
+
+        <p class="quick-notes-description">
+            Save your important study notes in one place.
+        </p>
+
+        <div class="quick-notes-form">
+
+            <label for="quickNoteTitle">Note Title</label>
+
+            <input
+                type="text"
+                id="quickNoteTitle"
+                placeholder="Example: Laws of Motion"
+                maxlength="80"
+            >
+
+            <label for="quickNoteSubject">Select Subject</label>
+
+            <select id="quickNoteSubject"></select>
+
+            <label for="quickNoteContent">Your Notes</label>
+
+            <textarea
+                id="quickNoteContent"
+                rows="6"
+                placeholder="Write your important points, formulas or definitions here..."
+            ></textarea>
+
+            <div class="quick-notes-buttons">
+
+                <button type="button" id="saveQuickNote">
+                    💾 Save Note
+                </button>
+
+                <button
+                    type="button"
+                    id="cancelQuickNote"
+                    style="display:none;"
+                >
+                    Cancel Edit
+                </button>
+
+            </div>
+
+            <p id="quickNoteStatus" aria-live="polite"></p>
+
+        </div>
+
+        <div class="quick-notes-search">
+            <input
+                type="search"
+                id="searchQuickNotes"
+                placeholder="🔍 Search your notes..."
+            >
+        </div>
+
+        <div class="quick-notes-count" id="quickNotesCount">
+            0 notes saved
+        </div>
+
+        <div id="quickNotesList"></div>
+    `;
+
+    // Place Quick Notes below the Subject Tracker.
+    const subjectTracker =
+        document.getElementById("subjectTracker");
+
+    if (subjectTracker) {
+        subjectTracker.insertAdjacentElement(
+            "afterend",
+            notesSection
+        );
+    } else {
+        document.body.appendChild(notesSection);
+    }
+
+    // Get HTML elements.
+    const titleInput =
+        document.getElementById("quickNoteTitle");
+
+    const subjectSelect =
+        document.getElementById("quickNoteSubject");
+
+    const contentInput =
+        document.getElementById("quickNoteContent");
+
+    const saveButton =
+        document.getElementById("saveQuickNote");
+
+    const cancelButton =
+        document.getElementById("cancelQuickNote");
+
+    const statusMessage =
+        document.getElementById("quickNoteStatus");
+
+    const searchInput =
+        document.getElementById("searchQuickNotes");
+
+    const notesList =
+        document.getElementById("quickNotesList");
+
+    const notesCount =
+        document.getElementById("quickNotesCount");
+
+    // Load subjects into the dropdown.
+    function renderNoteSubjects() {
+
+        const previousSubject = subjectSelect.value;
+
+        subjectSelect.innerHTML = "";
+
+        getSubjects().forEach(function(subject) {
+
+            const option = document.createElement("option");
+
+            option.value = subject;
+            option.textContent = subject;
+
+            subjectSelect.appendChild(option);
+        });
+
+        if (
+            previousSubject &&
+            getSubjects().includes(previousSubject)
+        ) {
+            subjectSelect.value = previousSubject;
+        }
+    }
+
+    // Reset the note form.
+    function resetNoteForm() {
+
+        editingNoteId = null;
+
+        titleInput.value = "";
+        contentInput.value = "";
+
+        saveButton.textContent = "💾 Save Note";
+        cancelButton.style.display = "none";
+
+        statusMessage.textContent = "";
+    }
+
+    // Create or update a note.
+    function saveQuickNote() {
+
+        const title = titleInput.value.trim();
+        const subject = subjectSelect.value;
+        const content = contentInput.value.trim();
+
+        if (!title || !content) {
+            statusMessage.textContent =
+                "Please enter both a title and note content.";
+            return;
+        }
+
+        if (!subject) {
+            statusMessage.textContent =
+                "Please select a subject.";
+            return;
+        }
+
+        if (editingNoteId !== null) {
+
+            const note = notes.find(
+                item => item.id === editingNoteId
+            );
+
+            if (note) {
+                note.title = title;
+                note.subject = subject;
+                note.content = content;
+                note.updatedAt = new Date().toISOString();
+            }
+
+            statusMessage.textContent =
+                "Your note has been updated!";
+
+        } else {
+
+            notes.unshift({
+                id: Date.now().toString(),
+                title: title,
+                subject: subject,
+                content: content,
+                createdAt: new Date().toISOString()
+            });
+
+            statusMessage.textContent =
+                "Your note has been saved!";
+        }
+
+        saveNotes();
+        resetNoteForm();
+        renderQuickNotes();
+    }
+
+    // Edit an existing note.
+    function editQuickNote(id) {
+
+        const note = notes.find(
+            item => item.id === id
+        );
+
+        if (!note) return;
+
+        editingNoteId = id;
+
+        titleInput.value = note.title;
+        contentInput.value = note.content;
+
+        renderNoteSubjects();
+
+        if (getSubjects().includes(note.subject)) {
+            subjectSelect.value = note.subject;
+        }
+
+        saveButton.textContent = "💾 Update Note";
+        cancelButton.style.display = "inline-block";
+
+        statusMessage.textContent =
+            "Editing: " + note.title;
+
+        notesSection.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }
+
+    // Delete a note.
+    function deleteQuickNote(id) {
+
+        const confirmed = confirm(
+            "Are you sure you want to delete this note?"
+        );
+
+        if (!confirmed) return;
+
+        notes = notes.filter(
+            note => note.id !== id
+        );
+
+        if (editingNoteId === id) {
+            resetNoteForm();
+        }
+
+        saveNotes();
+        renderQuickNotes();
+
+        statusMessage.textContent =
+            "Note deleted successfully.";
+    }
+
+    // Display saved notes.
+    function renderQuickNotes() {
+
+        const searchText =
+            searchInput.value.trim().toLowerCase();
+
+        const filteredNotes = notes.filter(function(note) {
+
+            return (
+                note.title.toLowerCase().includes(searchText) ||
+                note.content.toLowerCase().includes(searchText) ||
+                note.subject.toLowerCase().includes(searchText)
+            );
+        });
+
+        notesCount.textContent =
+            notes.length + (notes.length === 1
+                ? " note saved"
+                : " notes saved");
+
+        notesList.innerHTML = "";
+
+        if (filteredNotes.length === 0) {
+
+            const emptyMessage = document.createElement("p");
+
+            emptyMessage.className = "quick-notes-empty";
+
+            emptyMessage.textContent = searchText
+                ? "No notes found. Try another search."
+                : "No notes yet. Create your first study note!";
+
+            notesList.appendChild(emptyMessage);
+
+            return;
+        }
+
+        filteredNotes.forEach(function(note) {
+
+            const card = document.createElement("article");
+
+            card.className = "quick-note-item";
+
+            const heading = document.createElement("h3");
+            heading.textContent = "📘 " + note.title;
+
+            const subject = document.createElement("span");
+            subject.className = "quick-note-subject";
+            subject.textContent = note.subject;
+
+            const content = document.createElement("p");
+            content.className = "quick-note-content";
+            content.textContent = note.content;
+
+            const date = document.createElement("small");
+
+            const savedDate = new Date(note.createdAt);
+
+            date.textContent =
+                "Saved: " +
+                savedDate.toLocaleDateString("en-IN");
+
+            const actions = document.createElement("div");
+            actions.className = "quick-note-actions";
+
+            const editButton = document.createElement("button");
+            editButton.type = "button";
+            editButton.textContent = "✏️ Edit";
+
+            editButton.addEventListener("click", function() {
+                editQuickNote(note.id);
+            });
+
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.textContent = "🗑️ Delete";
+
+            deleteButton.addEventListener("click", function() {
+                deleteQuickNote(note.id);
+            });
+
+            actions.appendChild(editButton);
+            actions.appendChild(deleteButton);
+
+            card.appendChild(heading);
+            card.appendChild(subject);
+            card.appendChild(content);
+            card.appendChild(date);
+            card.appendChild(actions);
+
+            notesList.appendChild(card);
+        });
+    }
+
+    // Button events.
+    saveButton.addEventListener("click", saveQuickNote);
+
+    cancelButton.addEventListener("click", resetNoteForm);
+
+    searchInput.addEventListener("input", renderQuickNotes);
+
+    // Add CSS styling.
+    const style = document.createElement("style");
+
+    style.textContent = `
+        .quick-notes-card {
+            margin-top: 30px;
+        }
+
+        .quick-notes-description {
+            margin: 10px 0 22px;
+            opacity: 0.8;
+        }
+
+        .quick-notes-form label {
+            display: block;
+            margin: 15px 0 8px;
+            font-weight: bold;
+            color: #c4a5ff;
+        }
+
+        .quick-notes-form input,
+        .quick-notes-form select,
+        .quick-notes-form textarea,
+        .quick-notes-search input {
+            width: 100%;
+            padding: 13px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.07);
+            color: inherit;
+            font: inherit;
+        }
+
+        .quick-notes-form textarea {
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .quick-notes-form select option {
+            color: #222;
+        }
+
+        .quick-notes-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        #quickNoteStatus {
+            min-height: 20px;
+            margin-top: 10px;
+            color: #86efac;
+            font-size: 13px;
+        }
+
+        .quick-notes-search {
+            margin: 25px 0 15px;
+        }
+
+        .quick-notes-count {
+            margin-bottom: 15px;
+            color: #c4a5ff;
+            font-weight: bold;
+        }
+
+        .quick-note-item {
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.10);
+            overflow-wrap: anywhere;
+        }
+
+        .quick-note-item h3 {
+            margin-bottom: 10px;
+            color: #d9c5ff;
+        }
+
+        .quick-note-subject {
+            display: inline-block;
+            padding: 5px 10px;
+            margin-bottom: 12px;
+            border-radius: 20px;
+            background: rgba(149,101,255,0.18);
+            color: #c4a5ff;
+            font-size: 12px;
+        }
+
+        .quick-note-content {
+            white-space: pre-wrap;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .quick-note-item small {
+            opacity: 0.65;
+        }
+
+        .quick-note-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .quick-notes-empty {
+            padding: 25px;
+            text-align: center;
+            opacity: 0.7;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        @media (max-width: 500px) {
+            .quick-notes-buttons,
+            .quick-note-actions {
+                flex-direction: column;
+            }
+
+            .quick-notes-buttons button,
+            .quick-note-actions button {
+                width: 100%;
+            }
+        }
+    `;
+
+    document.head.appendChild(style);
+
+    // Add navigation link.
+    const navigation = document.querySelector(".navbar nav");
+
+    if (
+        navigation &&
+        !navigation.querySelector('a[href="#quickNotes"]')
+    ) {
+        const link = document.createElement("a");
+
+        link.href = "#quickNotes";
+        link.textContent = "Quick Notes";
+
+        navigation.appendChild(link);
+    }
+
+    renderNoteSubjects();
+    renderQuickNotes();
+
+})();
