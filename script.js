@@ -3921,3 +3921,35 @@ renderWeeklyAnalytics();
     console.log("StudySpace Stage 12: Productivity Insights loaded!");
 
 })();
+/* =========================================
+   STAGE 13.2 - SMOOTH SECTION REVEAL
+========================================= */
+
+(function () {
+    const revealElements = document.querySelectorAll(
+        "#quickNotes, #subjectTracker, #studyCalendar, #productivityInsights, .stat-card"
+    );
+
+    if (!("IntersectionObserver" in window)) {
+        return;
+    }
+
+    revealElements.forEach(element => {
+        element.classList.add("ss-reveal");
+    });
+
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("ss-visible");
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.12
+    });
+
+    revealElements.forEach(element => {
+        revealObserver.observe(element);
+    });
+})();
