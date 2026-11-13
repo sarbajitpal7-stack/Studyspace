@@ -530,11 +530,18 @@ function startTimer() {
     timerInterval = setInterval(function () {
         remainingTime--;
 
-        if (!isBreak) {
-            dailyData.studySeconds++;
-            saveDailyData();
-            updateStats();
-        }
+if (!isBreak) {
+
+    dailyData.studySeconds++;
+
+    // Stage 10: Record time for the selected subject.
+    if (typeof window.recordSubjectStudySecond === "function") {
+        window.recordSubjectStudySecond();
+    }
+
+    saveDailyData();
+    updateStats();
+}
 
         displayTimer();
 
