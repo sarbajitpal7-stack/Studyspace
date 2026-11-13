@@ -241,6 +241,8 @@ function displayTimer() {
 }
 
 // =================================
+
+// =================================
 // STUDY SESSION HISTORY
 // =================================
 
@@ -256,6 +258,8 @@ function getSessionHistory() {
     }
 }
 
+let sessionHistory = getSessionHistory();
+
 function saveSessionHistory() {
     localStorage.setItem(
         historyStorageKey,
@@ -263,28 +267,45 @@ function saveSessionHistory() {
     );
 }
 
-let sessionHistory = getSessionHistory();
+function renderSessionHistory() {
+    const list = document.getElementById("sessionHistoryList");
+    const totalSessions = document.getElementById("historyTotalSessions");
+    const totalTime = document.getElementById("historyTotalTime");
+    const count = document.getElementById("historySessionCount");
 
-function recordCompletedSession() {
-    const now = new Date();
+    if (!list || !totalSessions || !totalTime || !count) return;
 
-    const session = {
-        date: now.toLocaleDateString("en-IN"),
-        completedAt: now.toLocaleTimeString("en-IN", {
-            hour: "2-digit",
-            minute: "2-digit"
-        }),
-        durationMinutes: 25
-    };
+    totalSessions.textContent = sessionHistory.length;
 
-    sessionHistory.unshift(session);
+    const minutes = sessionHistory.reduce(
+        (total, session) => total + session.durationMinutes,
+        0
+    );
 
-    // Keep only the latest 100 sessions
-    sessionHistory = sessionHistory.slice(0, 100);
+    totalTime.textContent = minutes + " min";
+    count.textContent = sessionHistory.length + " records";
 
-    saveSessionHistory();
-    renderSessionHistory();
-   
+    if (sessionHistory.length === 0) {
+        list.innerHTML = `
+            <p class="empty-session-history">
+                Your completed study sessions will appear here.
+            </p>
+        `;
+        return;
+    }
+
+    list.innerHTML = sessionHistory.map(session => `
+        <div class="session-history-item">
+            <div>
+                <strong>🎯 Focus Session</strong>
+                <p>${session.date} • ${session.completedAt}</p>
+            </div>
+            <strong>${session.durationMinutes} min</strong>
+        </div>
+    `).join("");
+}
+
+
 // =========================================
 // STUDY STREAK TRACKER
 // =========================================
@@ -334,10 +355,13 @@ function renderStudyStreak() {
     const weekElement =
         document.getElementById("streakWeekDays");
 
-    if (!currentElement || !bestElement ||
-        !messageElement || !weekElement) return;
+    if (
+        !currentElement ||
+        !bestElement ||
+        !messageElement ||
+        !weekElement
+    ) return;
 
-    // Get unique dates with completed sessions
     const activeDates = new Set();
 
     sessionHistory.forEach(function(session) {
@@ -366,9 +390,10 @@ function renderStudyStreak() {
         }
     }
 
-    while (checkDate &&
-        activeDates.has(getLocalDateKey(checkDate))) {
-
+    while (
+        checkDate &&
+        activeDates.has(getLocalDateKey(checkDate))
+    ) {
         currentStreak++;
         checkDate.setDate(checkDate.getDate() - 1);
     }
@@ -394,11 +419,8 @@ function renderStudyStreak() {
                 (date - previousDate) / 86400000
             );
 
-            if (difference === 1) {
-                runningStreak++;
-            } else {
-                runningStreak = 1;
-            }
+            runningStreak =
+                difference === 1 ? runningStreak + 1 : 1;
         } else {
             runningStreak = 1;
         }
@@ -407,7 +429,6 @@ function renderStudyStreak() {
         previousDate = date;
     });
 
-    // Save best streak
     const savedBest = Number(
         localStorage.getItem(streakStorageKey)
     ) || 0;
@@ -416,29 +437,28 @@ function renderStudyStreak() {
 
     localStorage.setItem(
         streakStorageKey,
-        bestStreak
+        String(bestStreak)
     );
 
-    // Update streak numbers
     currentElement.textContent = currentStreak + " days";
     bestElement.textContent = bestStreak + " days";
 
     // Update weekly activity
     const startOfWeek = new Date(today);
-
     const mondayOffset = (today.getDay() + 6) % 7;
 
-    startOfWeek.setDate(
-        today.getDate() - mondayOffset
-    );
+    startOfWeek.setDate(today.getDate() - mondayOffset);
 
-    const dayCards = weekElement.querySelectorAll(".streak-day");
+    const dayCards =
+        weekElement.querySelectorAll(".streak-day");
 
     dayCards.forEach(function(card) {
         const dayNumber = Number(card.dataset.day);
 
         const date = new Date(startOfWeek);
-        date.setDate(startOfWeek.getDate() + ((dayNumber + 6) % 7));
+        date.setDate(
+            startOfWeek.getDate() + ((dayNumber + 6) % 7)
+        );
 
         const key = getLocalDateKey(date);
         const completed = activeDates.has(key);
@@ -452,7 +472,7 @@ function renderStudyStreak() {
         }
     });
 
-    // Update message
+    // Update streak message
     if (currentStreak === 0) {
         messageElement.textContent =
             "Complete a focus session today to start your streak!";
@@ -466,51 +486,40 @@ function renderStudyStreak() {
     }
 }
 
-// Display streak when the website loads
+
+// =================================
+// RECORD ONE COMPLETED SESSION
+// =================================
+
+function recordCompletedSession() {
+    const now = new Date();
+
+    const session = {
+        date: now.toLocaleDateString("en-IN"),
+        completedAt: now.toLocaleTimeString("en-IN", {
+            hour: "2-digit",
+            minute: "2-digit"
+        }),
+        durationMinutes: 25
+    };
+
+    sessionHistory.unshift(session);
+    sessionHistory = sessionHistory.slice(0, 100);
+
+    saveSessionHistory();
+    renderSessionHistory();
+    renderStudyStreak();
+}
+
+
+// Display saved information when website loads
+renderSessionHistory();
 renderStudyStreak();
 
-}
 
-function renderSessionHistory() {
-    const list = document.getElementById("sessionHistoryList");
-    const totalSessions = document.getElementById("historyTotalSessions");
-    const totalTime = document.getElementById("historyTotalTime");
-    const count = document.getElementById("historySessionCount");
-
-    if (!list || !totalSessions || !totalTime || !count) return;
-
-    totalSessions.textContent = sessionHistory.length;
-
-    const minutes = sessionHistory.reduce(
-        (total, session) => total + session.durationMinutes,
-        0
-    );
-
-    totalTime.textContent = minutes + " min";
-    count.textContent = sessionHistory.length + " records";
-
-    if (sessionHistory.length === 0) {
-        list.innerHTML = `
-            <p class="empty-session-history">
-                Your completed study sessions will appear here.
-            </p>
-        `;
-        return;
-    }
-
-    list.innerHTML = sessionHistory.map(session => `
-        <div class="session-history-item">
-            <div>
-                <strong>🎯 Focus Session</strong>
-                <p>${session.date} • ${session.completedAt}</p>
-            </div>
-            <strong>${session.durationMinutes} min</strong>
-        </div>
-    `).join("");
-}
-
-// Display saved history when the website loads
-renderSessionHistory();
+// =================================
+// POMODORO TIMER CONTROLS
+// =================================
 
 function startTimer() {
     if (timerInterval !== null || !timerRing) return;
@@ -525,7 +534,6 @@ function startTimer() {
             dailyData.studySeconds++;
             saveDailyData();
             updateStats();
-           recordCompletedSession();
         }
 
         displayTimer();
@@ -542,6 +550,9 @@ function startTimer() {
                 saveDailyData();
                 updateStats();
 
+                // Record the session ONLY once when completed.
+                recordCompletedSession();
+
                 isBreak = true;
                 remainingTime = breakDuration;
 
@@ -555,6 +566,7 @@ function startTimer() {
                 alert(
                     "Excellent work! Your study session is complete. Enjoy your 5-minute break!"
                 );
+
             } else {
                 isBreak = false;
                 remainingTime = studyDuration;
@@ -604,7 +616,6 @@ function resetTimer() {
 if (startButton) startButton.addEventListener("click", startTimer);
 if (pauseButton) pauseButton.addEventListener("click", pauseTimer);
 if (resetButton) resetButton.addEventListener("click", resetTimer);
-
 
 /* =================================
    EXAM COUNTDOWN UPGRADE
