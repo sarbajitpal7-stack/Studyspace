@@ -2234,3 +2234,566 @@ renderWeeklyAnalytics();
     showSelectedDate();
 
 })();
+
+/* =========================================
+   STAGE 10 - SUBJECT-WISE STUDY TRACKER
+========================================= */
+
+(function initialiseSubjectTracker() {
+
+    const subjectsStorageKey = "studyspace_subjects";
+    const subjectTimePrefix = "studyspace_subject_time_";
+
+    const defaultSubjects = [
+        "Physics",
+        "Chemistry",
+        "Mathematics",
+        "English",
+        "Computer Science"
+    ];
+
+    let subjects = [];
+
+    try {
+        subjects = JSON.parse(
+            localStorage.getItem(subjectsStorageKey)
+        ) || [...defaultSubjects];
+    } catch (error) {
+        subjects = [...defaultSubjects];
+    }
+
+    let selectedSubject =
+        localStorage.getItem("studyspace_selected_subject") ||
+        subjects[0];
+
+    if (!subjects.includes(selectedSubject)) {
+        selectedSubject = subjects[0];
+    }
+
+    function saveSubjects() {
+        localStorage.setItem(
+            subjectsStorageKey,
+            JSON.stringify(subjects)
+        );
+    }
+
+    function getTodayStorageKey() {
+        const date = new Date();
+
+        return subjectTimePrefix +
+            date.getFullYear() + "-" +
+            String(date.getMonth() + 1).padStart(2, "0") + "-" +
+            String(date.getDate()).padStart(2, "0");
+    }
+
+    function getTodaySubjectData() {
+        try {
+            return JSON.parse(
+                localStorage.getItem(getTodayStorageKey())
+            ) || {};
+        } catch (error) {
+            return {};
+        }
+    }
+
+    function saveTodaySubjectData(data) {
+        localStorage.setItem(
+            getTodayStorageKey(),
+            JSON.stringify(data)
+        );
+    }
+
+    // Called once per second by the existing focus timer.
+    window.recordSubjectStudySecond = function () {
+
+        if (!selectedSubject) return;
+
+        const data = getTodaySubjectData();
+
+        data[selectedSubject] =
+            (Number(data[selectedSubject]) || 0) + 1;
+
+        saveTodaySubjectData(data);
+        renderSubjectTracker();
+    };
+
+    function getAllSubjectTime() {
+
+        const totals = {};
+
+        subjects.forEach(function (subject) {
+            totals[subject] = 0;
+        });
+
+        for (let i = 0; i < localStorage.length; i++) {
+
+            const key = localStorage.key(i);
+
+            if (!key || !key.startsWith(subjectTimePrefix)) {
+                continue;
+            }
+
+            try {
+                const data = JSON.parse(
+                    localStorage.getItem(key)
+                ) || {};
+
+                subjects.forEach(function (subject) {
+                    totals[subject] +=
+                        Number(data[subject]) || 0;
+                });
+
+            } catch (error) {
+                console.warn("Could not read subject study data.");
+            }
+        }
+
+        return totals;
+    }
+
+    function formatSubjectTime(seconds) {
+
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+
+        if (hours > 0) {
+            return hours + " hr " + remainingMinutes + " min";
+        }
+
+        return minutes + " min";
+    }
+
+    // Create the subject selection control.
+    const timerCard = document.querySelector(".timer-card");
+
+    const subjectSelector = document.createElement("div");
+    subjectSelector.className = "subject-selector";
+
+    subjectSelector.innerHTML = `
+        <label for="studySubjectSelect">
+            📚 Choose Your Study Subject
+        </label>
+
+        <select id="studySubjectSelect"></select>
+
+        <p id="selectedSubjectMessage">
+            Your focus time will be recorded for this subject.
+        </p>
+    `;
+
+    if (timerCard) {
+        const timerRing = document.getElementById("timerRing");
+
+        if (timerRing) {
+            timerRing.insertAdjacentElement(
+                "beforebegin",
+                subjectSelector
+            );
+        } else {
+            timerCard.appendChild(subjectSelector);
+        }
+    }
+
+    const subjectSelect = document.getElementById(
+        "studySubjectSelect"
+    );
+
+    function renderSubjectOptions() {
+
+        if (!subjectSelect) return;
+
+        subjectSelect.innerHTML = "";
+
+        subjects.forEach(function (subject) {
+
+            const option = document.createElement("option");
+
+            option.value = subject;
+            option.textContent = subject;
+
+            subjectSelect.appendChild(option);
+        });
+
+        subjectSelect.value = selectedSubject;
+    }
+
+    if (subjectSelect) {
+
+        subjectSelect.addEventListener("change", function () {
+
+            selectedSubject = subjectSelect.value;
+
+            localStorage.setItem(
+                "studyspace_selected_subject",
+                selectedSubject
+            );
+
+            renderSubjectTracker();
+        });
+    }
+
+    // Create the subject management section.
+    const tracker = document.createElement("section");
+
+    tracker.className = "card subject-tracker-card";
+    tracker.id = "subjectTracker";
+
+    tracker.innerHTML = `
+        <h2>📊 Subject-wise Study Tracker</h2>
+
+        <p class="subject-tracker-description">
+            See how much time you spend studying each subject.
+        </p>
+
+        <div class="subject-add-area">
+            <input
+                type="text"
+                id="newSubjectInput"
+                placeholder="Enter a new subject..."
+                maxlength="30"
+            >
+
+            <button type="button" id="addSubjectButton">
+                + Add Subject
+            </button>
+        </div>
+
+        <p id="subjectStatus" aria-live="polite"></p>
+
+        <div class="subject-total-card">
+            <span>Total Subject Study Time</span>
+            <strong id="totalSubjectStudyTime">0 min</strong>
+        </div>
+
+        <div id="subjectProgressList"></div>
+    `;
+
+    const calendarSection =
+        document.getElementById("studyCalendar");
+
+    if (calendarSection) {
+        calendarSection.insertAdjacentElement(
+            "afterend",
+            tracker
+        );
+    } else if (timerCard) {
+        timerCard.insertAdjacentElement("afterend", tracker);
+    } else {
+        document.body.appendChild(tracker);
+    }
+
+    const subjectInput =
+        document.getElementById("newSubjectInput");
+
+    const addSubjectButton =
+        document.getElementById("addSubjectButton");
+
+    const subjectStatus =
+        document.getElementById("subjectStatus");
+
+    const subjectProgressList =
+        document.getElementById("subjectProgressList");
+
+    const totalSubjectStudyTime =
+        document.getElementById("totalSubjectStudyTime");
+
+    function renderSubjectTracker() {
+
+        const totals = getAllSubjectTime();
+
+        const totalSeconds = Object.values(totals).reduce(
+            (total, seconds) => total + seconds,
+            0
+        );
+
+        totalSubjectStudyTime.textContent =
+            formatSubjectTime(totalSeconds);
+
+        subjectProgressList.innerHTML = "";
+
+        if (subjects.length === 0) {
+            subjectProgressList.textContent =
+                "Add a subject to start tracking your study time.";
+            return;
+        }
+
+        subjects.forEach(function (subject) {
+
+            const seconds = totals[subject] || 0;
+
+            const percentage = totalSeconds > 0
+                ? (seconds / totalSeconds) * 100
+                : 0;
+
+            const item = document.createElement("div");
+
+            item.className = "subject-progress-item";
+
+            const heading = document.createElement("div");
+            heading.className = "subject-progress-heading";
+
+            const name = document.createElement("strong");
+            name.textContent = "📘 " + subject;
+
+            const time = document.createElement("span");
+            time.textContent = formatSubjectTime(seconds);
+
+            heading.appendChild(name);
+            heading.appendChild(time);
+
+            const progressTrack =
+                document.createElement("div");
+
+            progressTrack.className = "subject-progress-track";
+
+            const progressBar =
+                document.createElement("div");
+
+            progressBar.className = "subject-progress-bar";
+            progressBar.style.width = percentage + "%";
+
+            progressTrack.appendChild(progressBar);
+
+            const removeButton =
+                document.createElement("button");
+
+            removeButton.type = "button";
+            removeButton.className = "remove-subject-button";
+            removeButton.textContent = "Remove";
+
+            removeButton.addEventListener("click", function () {
+
+                const confirmed = confirm(
+                    "Remove " + subject +
+                    " from your subject list? Previous study records will remain saved."
+                );
+
+                if (!confirmed) return;
+
+                subjects = subjects.filter(
+                    item => item !== subject
+                );
+
+                if (selectedSubject === subject) {
+                    selectedSubject = subjects[0] || "";
+
+                    localStorage.setItem(
+                        "studyspace_selected_subject",
+                        selectedSubject
+                    );
+                }
+
+                saveSubjects();
+                renderSubjectOptions();
+                renderSubjectTracker();
+
+                subjectStatus.textContent =
+                    subject + " removed from your list.";
+            });
+
+            item.appendChild(heading);
+            item.appendChild(progressTrack);
+            item.appendChild(removeButton);
+
+            subjectProgressList.appendChild(item);
+        });
+    }
+
+    function addNewSubject() {
+
+        const name = subjectInput.value.trim();
+
+        if (!name) {
+            subjectStatus.textContent =
+                "Please enter a subject name.";
+            return;
+        }
+
+        const alreadyExists = subjects.some(
+            subject => subject.toLowerCase() === name.toLowerCase()
+        );
+
+        if (alreadyExists) {
+            subjectStatus.textContent =
+                "This subject already exists.";
+            return;
+        }
+
+        subjects.push(name);
+
+        if (!selectedSubject) {
+            selectedSubject = name;
+        }
+
+        saveSubjects();
+
+        localStorage.setItem(
+            "studyspace_selected_subject",
+            selectedSubject
+        );
+
+        subjectInput.value = "";
+
+        renderSubjectOptions();
+        renderSubjectTracker();
+
+        subjectStatus.textContent =
+            name + " added successfully!";
+    }
+
+    if (addSubjectButton) {
+        addSubjectButton.addEventListener(
+            "click",
+            addNewSubject
+        );
+    }
+
+    if (subjectInput) {
+        subjectInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                addNewSubject();
+            }
+        });
+    }
+
+    // Add responsive styling.
+    const style = document.createElement("style");
+
+    style.textContent = `
+        .subject-selector {
+            margin: 15px 0 22px;
+            padding: 18px;
+            border-radius: 15px;
+            background: rgba(149,101,255,0.10);
+        }
+
+        .subject-selector label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #c4a5ff;
+        }
+
+        .subject-selector select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            color: inherit;
+            background: var(--card-bg, #24213a);
+            border: 1px solid rgba(255,255,255,0.18);
+            font: inherit;
+        }
+
+        .subject-selector p {
+            margin-top: 9px;
+            font-size: 12px;
+            opacity: 0.75;
+        }
+
+        .subject-add-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0 10px;
+        }
+
+        .subject-add-area input {
+            flex: 1;
+            min-width: 180px;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.07);
+            color: inherit;
+            font: inherit;
+        }
+
+        .subject-total-card {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 15px;
+            background: rgba(149,101,255,0.13);
+            text-align: center;
+        }
+
+        .subject-total-card span,
+        .subject-total-card strong {
+            display: block;
+        }
+
+        .subject-total-card strong {
+            font-size: 28px;
+            color: #c4a5ff;
+            margin-top: 8px;
+        }
+
+        .subject-progress-item {
+            padding: 17px;
+            margin-bottom: 14px;
+            border-radius: 13px;
+            background: rgba(255,255,255,0.06);
+        }
+
+        .subject-progress-heading {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .subject-progress-heading span {
+            color: #c4a5ff;
+            font-weight: bold;
+        }
+
+        .subject-progress-track {
+            height: 10px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .subject-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #9565ff, #c4a5ff);
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+
+        .remove-subject-button {
+            margin-top: 12px;
+            padding: 7px 12px;
+            font-size: 12px;
+        }
+
+        #subjectStatus {
+            min-height: 18px;
+            font-size: 13px;
+            color: #86efac;
+        }
+
+        @media (max-width: 500px) {
+            .subject-progress-heading {
+                flex-direction: column;
+            }
+
+            .subject-add-area {
+                flex-direction: column;
+            }
+
+            .subject-add-area input,
+            .subject-add-area button {
+                width: 100%;
+            }
+        }
+    `;
+
+    document.head.appendChild(style);
+
+    saveSubjects();
+    renderSubjectOptions();
+    renderSubjectTracker();
+
+})();
