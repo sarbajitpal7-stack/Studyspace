@@ -2850,3 +2850,32 @@ body[data-theme="light"] #smartInsightsText p {
         animation: none !important;
     }
 }
+/* =========================================
+   STAGE 13.2 - SECTION REVEAL ANIMATION
+========================================= */
+
+.ss-reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+        opacity 0.65s ease,
+        transform 0.65s ease;
+}
+
+.ss-reveal.ss-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.ss-reveal.ss-visible.stat-card:hover {
+    transform: translateY(-6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ss-reveal,
+    .ss-reveal.ss-visible {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
