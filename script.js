@@ -3440,3 +3440,484 @@ renderWeeklyAnalytics();
     });
 
 })();
+
+/* =========================================
+   STUDYSPACE - STAGE 12
+   PRODUCTIVITY INSIGHTS
+========================================= */
+
+(function () {
+    "use strict";
+
+    // Prevent duplicate sections
+    if (document.getElementById("productivityInsights")) return;
+
+    const STORAGE_PREFIX = "studyspace_";
+    const SUBJECT_TIME_PREFIX = "studyspace_subject_time_";
+
+    // Get today's date in YYYY-MM-DD format
+    function getDateKey(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    }
+
+    // Safely read LocalStorage
+    function getStoredData(key, fallback) {
+        try {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : fallback;
+        } catch (error) {
+            return fallback;
+        }
+    }
+
+    // Format seconds into readable time
+    function formatStudyTime(seconds) {
+        seconds = Math.max(0, Math.floor(seconds));
+
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+
+        if (hours > 0) {
+            return `${hours} hr ${minutes} min`;
+        }
+
+        if (minutes > 0) {
+            return `${minutes} min`;
+        }
+
+        return `${seconds} sec`;
+    }
+
+    // Get all daily study records
+    function getDailyRecords() {
+        const records = [];
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+
+            if (!key || !/^studyspace_\d{4}-\d{2}-\d{2}$/.test(key)) {
+                continue;
+            }
+
+            const record = getStoredData(key, null);
+
+            if (record && typeof record === "object") {
+                records.push({
+                    date: key.replace("studyspace_", ""),
+                    studySeconds: Number(record.studySeconds) || 0,
+                    sessions: Number(record.sessions) || 0
+                });
+            }
+        }
+
+        return records;
+    }
+
+    // Calculate total study statistics
+    function calculateStatistics() {
+        const dailyRecords = getDailyRecords();
+
+        let totalStudySeconds = 0;
+        let totalSessions = 0;
+        let activeDays = 0;
+        let bestDay = null;
+
+        dailyRecords.forEach(record => {
+            totalStudySeconds += record.studySeconds;
+            totalSessions += record.sessions;
+
+            if (record.studySeconds > 0) {
+                activeDays++;
+            }
+
+            if (
+                record.studySeconds > 0 &&
+                (!bestDay || record.studySeconds > bestDay.studySeconds)
+            ) {
+                bestDay = record;
+            }
+        });
+
+        // Last seven days
+        let weeklyStudySeconds = 0;
+        let weeklyActiveDays = 0;
+
+        const today = new Date();
+
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                today.getDate() - i
+            );
+
+            const dateKey = getDateKey(date);
+
+            const record = dailyRecords.find(
+                item => item.date === dateKey
+            );
+
+            if (record) {
+                weeklyStudySeconds += record.studySeconds;
+
+                if (record.studySeconds > 0) {
+                    weeklyActiveDays++;
+                }
+            }
+        }
+
+        // Subject-wise study totals
+        const subjectTotals = {};
+        const subjects = getStoredData("studyspace_subjects", []);
+
+        if (Array.isArray(subjects)) {
+            subjects.forEach(subject => {
+                if (typeof subject === "string") {
+                    subjectTotals[subject] = 0;
+                }
+            });
+        }
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+
+            if (!key || !key.startsWith(SUBJECT_TIME_PREFIX)) {
+                continue;
+            }
+
+            const subjectData = getStoredData(key, {});
+
+            if (
+                subjectData &&
+                typeof subjectData === "object" &&
+                !Array.isArray(subjectData)
+            ) {
+                Object.keys(subjectData).forEach(subject => {
+                    const seconds = Number(subjectData[subject]) || 0;
+
+                    subjectTotals[subject] =
+                        (subjectTotals[subject] || 0) + seconds;
+                });
+            }
+        }
+
+        let favouriteSubject = "Not enough data";
+        let highestSubjectTime = 0;
+
+        Object.keys(subjectTotals).forEach(subject => {
+            if (subjectTotals[subject] > highestSubjectTime) {
+                highestSubjectTime = subjectTotals[subject];
+                favouriteSubject = subject;
+            }
+        });
+
+        return {
+            totalStudySeconds,
+            totalSessions,
+            activeDays,
+            bestDay,
+            weeklyStudySeconds,
+            weeklyActiveDays,
+            favouriteSubject,
+            highestSubjectTime
+        };
+    }
+
+    // Create the Productivity Insights section
+    const section = document.createElement("section");
+
+    section.id = "productivityInsights";
+    section.className = "productivity-insights";
+
+    section.innerHTML = `
+        <div class="insights-heading">
+            <div>
+                <h2>📊 Productivity Insights</h2>
+                <p>Understand your study habits and track your progress.</p>
+            </div>
+        </div>
+
+        <div class="insights-grid">
+
+            <div class="insight-card">
+                <div class="insight-icon">⏱️</div>
+                <h3>Total Study Time</h3>
+                <p class="insight-value" id="insightTotalTime">0 min</p>
+                <span>All-time focused study</span>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">📚</div>
+                <h3>Favourite Subject</h3>
+                <p class="insight-value" id="insightFavouriteSubject">
+                    Not enough data
+                </p>
+                <span id="insightSubjectTime">Your most studied subject</span>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">🏆</div>
+                <h3>Most Productive Day</h3>
+                <p class="insight-value" id="insightBestDay">No data yet</p>
+                <span id="insightBestDayTime">Your personal record</span>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">🔥</div>
+                <h3>Study Consistency</h3>
+                <p class="insight-value" id="insightConsistency">0 / 7 days</p>
+                <span>Active days in the last 7 days</span>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">📅</div>
+                <h3>Weekly Average</h3>
+                <p class="insight-value" id="insightWeeklyAverage">0 min</p>
+                <span>Average study time per day</span>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">🎯</div>
+                <h3>Completed Sessions</h3>
+                <p class="insight-value" id="insightSessions">0</p>
+                <span>Successfully completed focus sessions</span>
+            </div>
+
+        </div>
+
+        <div class="smart-insights-card">
+            <h3>💡 Your Smart Study Insights</h3>
+            <div id="smartInsightsText" aria-live="polite">
+                Start a focus session to discover your study insights!
+            </div>
+        </div>
+    `;
+
+    // Add section below Quick Notes
+    const quickNotes = document.getElementById("quickNotes");
+
+    if (quickNotes) {
+        quickNotes.insertAdjacentElement("afterend", section);
+    } else {
+        document.body.appendChild(section);
+    }
+
+    // Add navigation link if a suitable navigation bar exists
+    const nav = document.querySelector(".navbar nav");
+
+    if (
+        nav &&
+        !nav.querySelector('a[href="#productivityInsights"]')
+    ) {
+        const navLink = document.createElement("a");
+
+        navLink.href = "#productivityInsights";
+        navLink.textContent = "Insights";
+        navLink.className = "nav-link";
+
+        nav.appendChild(navLink);
+    }
+
+    // Add Stage 12 styling
+    const style = document.createElement("style");
+
+    style.textContent = `
+        .productivity-insights {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 18px;
+            background: var(--card-bg, rgba(255,255,255,0.06));
+            color: var(--text-color, inherit);
+        }
+
+        .insights-heading {
+            margin-bottom: 25px;
+        }
+
+        .insights-heading h2 {
+            margin-bottom: 8px;
+        }
+
+        .insights-heading p {
+            opacity: 0.7;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .insight-card {
+            padding: 22px;
+            border-radius: 15px;
+            background: var(--section-bg, rgba(128, 100, 200, 0.10));
+            border: 1px solid rgba(150, 120, 220, 0.18);
+            min-width: 0;
+            transition: transform 0.25s ease;
+        }
+
+        .insight-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .insight-icon {
+            font-size: 27px;
+            margin-bottom: 12px;
+        }
+
+        .insight-card h3 {
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .insight-value {
+            font-size: 23px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            overflow-wrap: anywhere;
+        }
+
+        .insight-card span {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .smart-insights-card {
+            margin-top: 22px;
+            padding: 22px;
+            border-radius: 15px;
+            background: var(--section-bg, rgba(128, 100, 200, 0.10));
+            border: 1px solid rgba(150, 120, 220, 0.18);
+        }
+
+        .smart-insights-card h3 {
+            margin-bottom: 15px;
+        }
+
+        #smartInsightsText p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 850px) {
+            .insights-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 550px) {
+            .productivity-insights {
+                padding: 16px;
+            }
+
+            .insights-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .insight-card {
+                padding: 18px;
+            }
+        }
+    `;
+
+    document.head.appendChild(style);
+
+    // Update the Productivity Insights dashboard
+    function updateProductivityInsights() {
+        const stats = calculateStatistics();
+
+        document.getElementById("insightTotalTime").textContent =
+            formatStudyTime(stats.totalStudySeconds);
+
+        document.getElementById("insightFavouriteSubject").textContent =
+            stats.favouriteSubject;
+
+        document.getElementById("insightSubjectTime").textContent =
+            stats.highestSubjectTime > 0
+                ? formatStudyTime(stats.highestSubjectTime) + " studied"
+                : "Your most studied subject";
+
+        document.getElementById("insightBestDay").textContent =
+            stats.bestDay
+                ? new Date(stats.bestDay.date + "T00:00:00")
+                    .toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric"
+                    })
+                : "No data yet";
+
+        document.getElementById("insightBestDayTime").textContent =
+            stats.bestDay
+                ? formatStudyTime(stats.bestDay.studySeconds) + " studied"
+                : "Your personal record";
+
+        document.getElementById("insightConsistency").textContent =
+            `${stats.weeklyActiveDays} / 7 days`;
+
+        document.getElementById("insightWeeklyAverage").textContent =
+            formatStudyTime(stats.weeklyStudySeconds / 7);
+
+        document.getElementById("insightSessions").textContent =
+            stats.totalSessions;
+
+        // Generate personalised insights
+        const insights = [];
+
+        if (stats.totalStudySeconds === 0) {
+            insights.push(
+                "🌱 Your StudySpace journey starts here! Complete a focus session to see your progress."
+            );
+        } else {
+            insights.push(
+                `⏳ You have studied for a total of ${formatStudyTime(stats.totalStudySeconds)}. Keep building your progress!`
+            );
+
+            if (stats.favouriteSubject !== "Not enough data") {
+                insights.push(
+                    `📚 ${stats.favouriteSubject} is currently your most studied subject.`
+                );
+            }
+
+            insights.push(
+                `🔥 You studied on ${stats.weeklyActiveDays} out of the last 7 days.`
+            );
+
+            if (stats.bestDay) {
+                insights.push(
+                    `🏆 Your most productive day so far was ${stats.bestDay.date}.`
+                );
+            }
+
+            if (stats.totalSessions > 0) {
+                insights.push(
+                    `🎯 You have completed ${stats.totalSessions} focus sessions.`
+                );
+            }
+        }
+
+        const smartInsights = document.getElementById("smartInsightsText");
+
+        smartInsights.replaceChildren();
+
+        insights.forEach(message => {
+            const paragraph = document.createElement("p");
+            paragraph.textContent = message;
+            smartInsights.appendChild(paragraph);
+        });
+    }
+
+    // Initial update
+    updateProductivityInsights();
+
+    // Refresh statistics periodically
+    setInterval(updateProductivityInsights, 5000);
+
+    console.log("StudySpace Stage 12: Productivity Insights loaded!");
+
+})();
