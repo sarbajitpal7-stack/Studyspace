@@ -1722,3 +1722,515 @@ renderWeeklyAnalytics();
     };
 
 })();
+
+/* =========================================
+   STAGE 9 - PERSONAL STUDY CALENDAR
+========================================= */
+
+(function initialiseStudyCalendar() {
+
+    if (document.getElementById("studyCalendar")) return;
+
+    const calendarStorageKey = "studyspace_calendar_notes";
+
+    let displayedDate = new Date();
+    let selectedDate = new Date();
+
+    function getDateKey(date) {
+        return date.getFullYear() + "-" +
+            String(date.getMonth() + 1).padStart(2, "0") + "-" +
+            String(date.getDate()).padStart(2, "0");
+    }
+
+    function getDayData(date) {
+        const key = "studyspace_" + date.toLocaleDateString("en-CA");
+
+        try {
+            return JSON.parse(localStorage.getItem(key)) || {
+                goals: [],
+                studySeconds: 0,
+                sessions: 0
+            };
+        } catch (error) {
+            return {
+                goals: [],
+                studySeconds: 0,
+                sessions: 0
+            };
+        }
+    }
+
+    function getCalendarNotes() {
+        try {
+            return JSON.parse(
+                localStorage.getItem(calendarStorageKey)
+            ) || {};
+        } catch (error) {
+            return {};
+        }
+    }
+
+    function saveCalendarNotes(notes) {
+        localStorage.setItem(
+            calendarStorageKey,
+            JSON.stringify(notes)
+        );
+    }
+
+    const calendar = document.createElement("section");
+    calendar.className = "card study-calendar-card";
+    calendar.id = "studyCalendar";
+
+    calendar.innerHTML = `
+        <h2>🗓️ Personal Study Calendar</h2>
+        <p>Track your daily study activity and progress.</p>
+
+        <div class="calendar-header">
+            <button type="button" id="calendarPrevious">←</button>
+            <h3 id="calendarMonth"></h3>
+            <button type="button" id="calendarNext">→</button>
+        </div>
+
+        <div class="calendar-weekdays">
+            <span>Mon</span>
+            <span>Tue</span>
+            <span>Wed</span>
+            <span>Thu</span>
+            <span>Fri</span>
+            <span>Sat</span>
+            <span>Sun</span>
+        </div>
+
+        <div class="calendar-grid" id="calendarGrid"></div>
+
+        <div class="calendar-legend">
+            <span><i class="legend-today"></i> Today</span>
+            <span><i class="legend-active"></i> Study completed</span>
+        </div>
+
+        <div class="calendar-details" id="calendarDetails">
+            <h3>📚 Daily Details</h3>
+            <p>Select a date to see your study progress.</p>
+        </div>
+
+        <div class="calendar-note-area">
+            <label for="calendarNote">📝 Personal note for selected date</label>
+            <textarea id="calendarNote"
+                placeholder="Write your study plan or a reminder..."
+                rows="3"></textarea>
+            <button type="button" id="saveCalendarNote">
+                Save Note
+            </button>
+            <p id="calendarNoteMessage" aria-live="polite"></p>
+        </div>
+    `;
+
+    const analyticsSection = document.getElementById("analytics");
+
+    if (analyticsSection) {
+        analyticsSection.insertAdjacentElement("afterend", calendar);
+    } else {
+        const container = document.querySelector(".container");
+        if (container) container.appendChild(calendar);
+    }
+
+    // Add navigation link
+    const navigation = document.querySelector(".navbar nav");
+
+    if (
+        navigation &&
+        !navigation.querySelector('a[href="#studyCalendar"]')
+    ) {
+        const link = document.createElement("a");
+        link.href = "#studyCalendar";
+        link.textContent = "Study Calendar";
+        navigation.appendChild(link);
+    }
+
+    const monthTitle = document.getElementById("calendarMonth");
+    const calendarGrid = document.getElementById("calendarGrid");
+    const details = document.getElementById("calendarDetails");
+    const noteInput = document.getElementById("calendarNote");
+    const noteMessage = document.getElementById("calendarNoteMessage");
+
+    function showSelectedDate() {
+        const data = getDayData(selectedDate);
+        const key = getDateKey(selectedDate);
+        const notes = getCalendarNotes();
+
+        const studyMinutes = Math.floor(
+            (Number(data.studySeconds) || 0) / 60
+        );
+
+        const goals = Array.isArray(data.goals) ? data.goals : [];
+
+        const completedGoals = goals.filter(
+            goal => goal && goal.completed
+        ).length;
+
+        details.innerHTML = `
+            <h3>📚 Daily Details</h3>
+            <p id="selectedCalendarDate"></p>
+            <div class="calendar-detail-stats">
+                <div>
+                    <strong id="calendarStudyTime"></strong>
+                    <span>Study Time</span>
+                </div>
+                <div>
+                    <strong id="calendarSessions"></strong>
+                    <span>Focus Sessions</span>
+                </div>
+                <div>
+                    <strong id="calendarGoals"></strong>
+                    <span>Goals Completed</span>
+                </div>
+            </div>
+            <p id="calendarGoalList"></p>
+        `;
+
+        document.getElementById("selectedCalendarDate").textContent =
+            selectedDate.toLocaleDateString("en-IN", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            });
+
+        document.getElementById("calendarStudyTime").textContent =
+            studyMinutes + " min";
+
+        document.getElementById("calendarSessions").textContent =
+            Number(data.sessions) || 0;
+
+        document.getElementById("calendarGoals").textContent =
+            completedGoals + "/" + goals.length;
+
+        const goalList = document.getElementById("calendarGoalList");
+
+        if (goals.length === 0) {
+            goalList.textContent = "No study goals recorded for this date.";
+        } else {
+            goalList.textContent = "Goals: " +
+                goals.map(goal =>
+                    (goal.completed ? "✓ " : "○ ") + goal.text
+                ).join(" | ");
+        }
+
+        noteInput.value = notes[key] || "";
+        noteMessage.textContent = "";
+    }
+
+    function renderCalendar() {
+        const year = displayedDate.getFullYear();
+        const month = displayedDate.getMonth();
+
+        monthTitle.textContent = displayedDate.toLocaleDateString(
+            "en-IN",
+            { month: "long", year: "numeric" }
+        );
+
+        calendarGrid.innerHTML = "";
+
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+
+        const mondayOffset = (firstDay.getDay() + 6) % 7;
+
+        for (let i = 0; i < mondayOffset; i++) {
+            const empty = document.createElement("div");
+            empty.className = "calendar-empty";
+            calendarGrid.appendChild(empty);
+        }
+
+        const todayKey = getDateKey(new Date());
+
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+            const date = new Date(year, month, day);
+            const key = getDateKey(date);
+            const data = getDayData(date);
+
+            const hasActivity =
+                (Number(data.studySeconds) || 0) > 0 ||
+                (Number(data.sessions) || 0) > 0;
+
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "calendar-day";
+            button.textContent = day;
+
+            if (key === todayKey) {
+                button.classList.add("calendar-today");
+            }
+
+            if (hasActivity) {
+                button.classList.add("calendar-active");
+            }
+
+            if (key === getDateKey(selectedDate)) {
+                button.classList.add("calendar-selected");
+            }
+
+            button.setAttribute(
+                "aria-label",
+                date.toDateString() +
+                (hasActivity ? ", study activity recorded" : "")
+            );
+
+            button.addEventListener("click", function() {
+                selectedDate = new Date(date);
+                renderCalendar();
+                showSelectedDate();
+            });
+
+            calendarGrid.appendChild(button);
+        }
+    }
+
+    document.getElementById("calendarPrevious")
+        .addEventListener("click", function() {
+            displayedDate.setMonth(displayedDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+    document.getElementById("calendarNext")
+        .addEventListener("click", function() {
+            displayedDate.setMonth(displayedDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+    document.getElementById("saveCalendarNote")
+        .addEventListener("click", function() {
+            const notes = getCalendarNotes();
+            const key = getDateKey(selectedDate);
+            const note = noteInput.value.trim();
+
+            if (note) {
+                notes[key] = note;
+            } else {
+                delete notes[key];
+            }
+
+            saveCalendarNotes(notes);
+            noteMessage.textContent = "Your calendar note has been saved!";
+        });
+
+    // Add calendar styling
+    const calendarStyle = document.createElement("style");
+
+    calendarStyle.textContent = `
+        .study-calendar-card {
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .calendar-header h3 {
+            color: #d9c5ff;
+            text-align: center;
+            font-size: 21px;
+        }
+
+        .calendar-header button {
+            min-width: 42px;
+            padding: 10px;
+        }
+
+        .calendar-weekdays,
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .calendar-weekdays {
+            margin-bottom: 10px;
+            text-align: center;
+            color: #c4a8ff;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .calendar-day {
+            min-width: 0;
+            aspect-ratio: 1;
+            margin: 0;
+            padding: 4px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.07);
+            color: white;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        .calendar-day:hover {
+            background: rgba(149,101,255,0.3);
+        }
+
+        .calendar-day.calendar-today {
+            border: 2px solid #9565ff;
+        }
+
+        .calendar-day.calendar-active {
+            background: rgba(22,163,112,0.3);
+            border-color: #34d399;
+        }
+
+        .calendar-day.calendar-selected {
+            outline: 2px solid #c4a5ff;
+            outline-offset: 2px;
+        }
+
+        .calendar-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+            color: #c9c4df;
+            font-size: 13px;
+        }
+
+        .calendar-legend span {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .calendar-legend i {
+            width: 11px;
+            height: 11px;
+            display: inline-block;
+            border-radius: 50%;
+        }
+
+        .legend-today {
+            background: #9565ff;
+        }
+
+        .legend-active {
+            background: #34d399;
+        }
+
+        .calendar-details {
+            margin-top: 25px;
+            padding: 22px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .calendar-details h3 {
+            color: #d9c5ff;
+            margin-bottom: 15px;
+        }
+
+        .calendar-details p {
+            color: #c9c4df;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+        }
+
+        .calendar-detail-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin: 18px 0;
+        }
+
+        .calendar-detail-stats div {
+            padding: 15px 8px;
+            border-radius: 12px;
+            text-align: center;
+            background: rgba(149,101,255,0.12);
+        }
+
+        .calendar-detail-stats strong,
+        .calendar-detail-stats span {
+            display: block;
+        }
+
+        .calendar-detail-stats strong {
+            color: #c4a5ff;
+            font-size: 20px;
+            overflow-wrap: anywhere;
+        }
+
+        .calendar-detail-stats span {
+            color: #c9c4df;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .calendar-note-area {
+            margin-top: 25px;
+        }
+
+        .calendar-note-area label {
+            display: block;
+            color: #d9c5ff;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .calendar-note-area textarea {
+            width: 100%;
+            resize: vertical;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.07);
+            color: white;
+            font: inherit;
+            line-height: 1.5;
+        }
+
+        .calendar-note-area textarea:focus {
+            outline: 2px solid #9565ff;
+        }
+
+        .calendar-note-area p {
+            color: #86efac;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 500px) {
+            .calendar-weekdays,
+            .calendar-grid {
+                gap: 4px;
+            }
+
+            .calendar-day {
+                border-radius: 8px;
+                font-size: 12px;
+            }
+
+            .calendar-detail-stats {
+                gap: 6px;
+            }
+
+            .calendar-detail-stats div {
+                padding: 12px 4px;
+            }
+
+            .calendar-detail-stats strong {
+                font-size: 16px;
+            }
+
+            .calendar-detail-stats span {
+                font-size: 10px;
+            }
+        }
+    `;
+
+    document.head.appendChild(calendarStyle);
+
+    renderCalendar();
+    showSelectedDate();
+
+})();
