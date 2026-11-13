@@ -2584,3 +2584,219 @@ body.focus-mode-open {
         font-size: 23px;
     }
 }
+
+/* =========================================
+   STAGE 13 - PREMIUM UI POLISH
+========================================= */
+
+/* Consistent scrolling for dashboard sections */
+
+section,
+.card,
+.productivity-insights {
+    scroll-margin-top: 110px;
+}
+
+/* Improved dashboard card appearance */
+
+.card,
+.stat-card,
+.dashboard-settings-card,
+.productivity-insights,
+.insight-card,
+.smart-insights-card {
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        border-color 0.3s ease,
+        background-color 0.3s ease;
+}
+
+/* Premium card hover effects */
+
+.stat-card:hover,
+.insight-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--ss-accent-light);
+    box-shadow:
+        0 12px 28px var(--ss-accent-soft),
+        0 0 15px var(--ss-accent-glow);
+}
+
+/* Improved dashboard headings */
+
+.card h2,
+.insights-heading h2,
+.smart-insights-card h3 {
+    letter-spacing: 0.3px;
+}
+
+/* Better button interactions */
+
+button {
+    position: relative;
+    overflow: hidden;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        filter 0.25s ease;
+}
+
+button:active {
+    transform: scale(0.96);
+}
+
+button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Improved input interactions */
+
+input,
+select,
+textarea {
+    transition:
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        background-color 0.25s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--ss-accent);
+    box-shadow: 0 0 0 3px var(--ss-accent-soft);
+}
+
+/* Better navigation appearance */
+
+.navbar nav a {
+    padding: 5px 2px;
+    transition: color 0.25s ease;
+}
+
+/* Improved Quick Notes and Subject Tracker */
+
+#quickNotes,
+#subjectTracker,
+#studyCalendar,
+#productivityInsights {
+    border-radius: 22px;
+    transition:
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+/* Productivity Insights improvements */
+
+.insight-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.insight-card .insight-icon {
+    transition: transform 0.3s ease;
+}
+
+.insight-card:hover .insight-icon {
+    transform: scale(1.12);
+}
+
+.insight-value {
+    color: var(--ss-accent-light);
+}
+
+/* Smooth appearance for smart insights */
+
+#smartInsightsText p {
+    animation: insightAppear 0.45s ease both;
+}
+
+@keyframes insightAppear {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Better keyboard accessibility */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--ss-accent-light);
+    outline-offset: 4px;
+}
+
+/* Light theme improvements */
+
+body[data-theme="light"] .insight-card,
+body[data-theme="light"] .smart-insights-card {
+    background: #ffffff;
+    border-color: rgba(112, 84, 170, 0.18);
+    color: #30264b;
+}
+
+body[data-theme="light"] .insight-card h3,
+body[data-theme="light"] .smart-insights-card h3 {
+    color: #594080;
+}
+
+body[data-theme="light"] .insight-value {
+    color: var(--ss-accent-dark);
+}
+
+body[data-theme="light"] #smartInsightsText p {
+    color: #51496b;
+}
+
+/* Responsive improvements */
+
+@media (max-width: 768px) {
+    .insights-heading h2 {
+        font-size: 22px;
+    }
+
+    .insight-value {
+        font-size: 21px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card,
+    .productivity-insights {
+        border-radius: 18px;
+    }
+
+    button {
+        max-width: 100%;
+    }
+}
+
+/* Respect reduced-motion preferences */
+
+@media (prefers-reduced-motion: reduce) {
+    .card,
+    .stat-card,
+    .insight-card,
+    button,
+    input,
+    select,
+    textarea {
+        transition: none !important;
+    }
+
+    #smartInsightsText p {
+        animation: none !important;
+    }
+}
