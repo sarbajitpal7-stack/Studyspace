@@ -3361,3 +3361,82 @@ renderWeeklyAnalytics();
     renderQuickNotes();
 
 })();
+
+/* =================================
+   STAGE 11 - ADD SUBJECT FROM QUICK NOTES
+================================= */
+
+(function addQuickNotesSubjectFeature() {
+
+    const subjectSelect = document.getElementById("quickNoteSubject");
+
+    if (!subjectSelect) return;
+
+    // Create the Add Subject button
+    const addButton = document.createElement("button");
+
+    addButton.type = "button";
+    addButton.textContent = "+ Add Subject";
+    addButton.style.marginTop = "8px";
+    addButton.style.padding = "9px 15px";
+    addButton.style.borderRadius = "8px";
+    addButton.style.border = "none";
+    addButton.style.cursor = "pointer";
+    addButton.style.fontWeight = "600";
+
+    subjectSelect.insertAdjacentElement("afterend", addButton);
+
+    // Add a new subject using Stage 10's existing feature
+    addButton.addEventListener("click", function () {
+
+        const subjectName = prompt("Enter the new subject name:");
+
+        if (!subjectName || !subjectName.trim()) return;
+
+        const newSubject = subjectName.trim();
+
+        const subjects = JSON.parse(
+            localStorage.getItem("studyspace_subjects") || "[]"
+        );
+
+        const alreadyExists = subjects.some(
+            subject => subject.toLowerCase() === newSubject.toLowerCase()
+        );
+
+        if (alreadyExists) {
+            alert("This subject already exists!");
+            return;
+        }
+
+        // Use the existing Stage 10 Add Subject button
+        const trackerInput = document.getElementById("newSubjectInput");
+        const trackerButton = document.getElementById("addSubjectButton");
+
+        if (!trackerInput || !trackerButton) {
+            alert("Could not connect to the Subject Tracker.");
+            return;
+        }
+
+        trackerInput.value = newSubject;
+        trackerButton.click();
+
+        // Refresh the Quick Notes subject dropdown
+        const updatedSubjects = JSON.parse(
+            localStorage.getItem("studyspace_subjects") || "[]"
+        );
+
+        subjectSelect.innerHTML = "";
+
+        updatedSubjects.forEach(subject => {
+            const option = document.createElement("option");
+            option.value = subject;
+            option.textContent = subject;
+            subjectSelect.appendChild(option);
+        });
+
+        subjectSelect.value = newSubject;
+
+        alert("Subject added successfully!");
+    });
+
+})();
