@@ -645,11 +645,12 @@ function setupFeedbackForm() {
 
             form.reset();
 
-        } catch (error) {
-            console.error("Feedback submission failed:", error);
+       } catch (error) {
+    console.error("Feedback submission failed:", error);
 
-            status.textContent =
-                "Could not submit feedback. Please try again.";
+    status.textContent =
+        "Error: " + error.message;
+}
         } finally {
             button.disabled = false;
             button.textContent = "Submit Feedback";
