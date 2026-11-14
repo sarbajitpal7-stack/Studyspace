@@ -243,6 +243,9 @@ function createAuthUI() {
             >
 
             <button id="studyspaceSubmitAuth">Continue</button>
+            <button id="studyspaceResendEmail" class="secondary">
+    Resend Confirmation Email
+</button>
             <button id="studyspaceCancelAuth" class="secondary">
                 Cancel
             </button>
@@ -273,7 +276,8 @@ function createAuthUI() {
 
     document.getElementById("studyspaceSubmitAuth")
         .addEventListener("click", submitAuth);
-
+document.getElementById("studyspaceResendEmail")
+    .addEventListener("click", resendConfirmationEmail);
     document.getElementById("studyspaceSyncButton")
         .addEventListener("click", syncToCloud);
 
@@ -477,3 +481,32 @@ async function startStudySpace() {
 }
 
 startStudySpace();
+
+async function resendConfirmationEmail() {
+    const email = document
+        .getElementById("studyspaceEmail")
+        .value.trim();
+
+    if (!email) {
+        showAuthMessage("Please enter your email address first.");
+        return;
+    }
+
+    const { error } = await supabaseClient.auth.resend({
+        type: "signup",
+        email: email,
+        options: {
+            emailRedirectTo:
+                "https://sarbajitpal7-stack.github.io/Studyspace/"
+        }
+    });
+
+    if (error) {
+        showAuthMessage(error.message);
+        return;
+    }
+
+    showAuthMessage(
+        "A fresh confirmation email has been requested. Check your inbox."
+    );
+}
