@@ -280,6 +280,49 @@
         </section>
     </main>
 
+<!-- Feedback Section -->
+<section class="card feedback-card" id="feedback">
+    <h2>💬 Share Your Feedback</h2>
+    <p>Help us make StudySpace better for every student.</p>
+
+    <form id="feedbackForm">
+
+        <label for="feedbackRating">How was your experience?</label>
+        <select id="feedbackRating" required>
+            <option value="">Choose a rating</option>
+            <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+            <option value="4">⭐⭐⭐⭐ Good</option>
+            <option value="3">⭐⭐⭐ Average</option>
+            <option value="2">⭐⭐ Poor</option>
+            <option value="1">⭐ Very Poor</option>
+        </select>
+
+        <label for="feedbackCategory">Feedback category</label>
+        <select id="feedbackCategory" required>
+            <option value="">Select category</option>
+            <option value="Suggestion">Suggestion</option>
+            <option value="Bug Report">Bug Report</option>
+            <option value="General Feedback">General Feedback</option>
+        </select>
+
+        <label for="feedbackMessage">Your feedback</label>
+        <textarea
+            id="feedbackMessage"
+            placeholder="Tell us what you think about StudySpace..."
+            rows="5"
+            required
+            maxlength="2000"
+        ></textarea>
+
+        <button type="submit" id="submitFeedback">
+            Submit Feedback
+        </button>
+
+        <p id="feedbackStatus" role="status"></p>
+
+    </form>
+</section>
+
     <!-- Footer -->
     <footer>
         <h3>StudySpace 🌙</h3>
