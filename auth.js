@@ -644,12 +644,11 @@ function setupFeedbackForm() {
                 "Thank you! Your feedback was submitted successfully.";
 
             form.reset();
-
-       } catch (error) {
+} catch (error) {
     console.error("Feedback submission failed:", error);
 
     status.textContent =
-        "Error: " + error.message;
+        "Could not submit feedback. Please try again.";
 }
         } finally {
             button.disabled = false;
