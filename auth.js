@@ -133,7 +133,41 @@ async function syncToCloud() {
         cloudSyncInProgress = false;
     }
 }
+async function loadCloudData(user) {
+    const { data, error } = await supabaseClient
+        .from("studyspace_data")
+        .select("data")
+        .eq("user_id", user.id)
+        .maybeSingle();
 
+    if (error) {
+        showAuthMessage("Could not load cloud data: " + error.message);
+        throw error;
+    }
+
+    if (data && data.data) {
+        restoreData(data.data);
+        showAuthMessage("Your cloud data has been restored.");
+        return;
+    }
+
+    const snapshot = getStudySpaceData();
+
+    const { error: saveError } = await supabaseClient
+        .from("studyspace_data")
+        .upsert({
+            user_id: user.id,
+            data: snapshot,
+            updated_at: new Date().toISOString()
+        });
+
+    if (saveError) {
+        showAuthMessage("Could not create account backup: " + saveError.message);
+        throw saveError;
+    }
+
+    showAuthMessage("Your account backup has been created.");
+}
 /* =========================================
    AUTHENTICATION UI
 ========================================= */
@@ -352,7 +386,7 @@ async function submitAuth() {
             );
             return;
         }
-
+saveGuestBackup();
         currentUser = result.data.user;
 
         await loadCloudData(currentUser);
