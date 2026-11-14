@@ -589,3 +589,72 @@ function installAutoSync() {
 
     window.studySpaceAutoSyncInstalled = true;
 }
+
+/* =========================================
+   STUDYSPACE FEEDBACK SYSTEM
+========================================= */
+
+function setupFeedbackForm() {
+    const form = document.getElementById("feedbackForm");
+
+    if (!form) return;
+
+    form.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const rating = Number(
+            document.getElementById("feedbackRating").value
+        );
+
+        const category =
+            document.getElementById("feedbackCategory").value;
+
+        const message =
+            document.getElementById("feedbackMessage").value.trim();
+
+        const status =
+            document.getElementById("feedbackStatus");
+
+        const button =
+            document.getElementById("submitFeedback");
+
+        if (!rating || !category || !message) {
+            status.textContent = "Please complete all fields.";
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = "Submitting...";
+
+        status.textContent = "";
+
+        try {
+            const { error } = await supabaseClient
+                .from("studyspace_feedback")
+                .insert({
+                    user_id: currentUser ? currentUser.id : null,
+                    rating: rating,
+                    category: category,
+                    message: message
+                });
+
+            if (error) throw error;
+
+            status.textContent =
+                "Thank you! Your feedback was submitted successfully.";
+
+            form.reset();
+
+        } catch (error) {
+            console.error("Feedback submission failed:", error);
+
+            status.textContent =
+                "Could not submit feedback. Please try again.";
+        } finally {
+            button.disabled = false;
+            button.textContent = "Submit Feedback";
+        }
+    });
+}
+
+setupFeedbackForm();
