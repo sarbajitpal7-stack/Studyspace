@@ -512,3 +512,46 @@ async function resendConfirmationEmail() {
         "A fresh confirmation email has been requested. Check your inbox."
     );
 }
+
+function scheduleAutoSync() {
+    if (!currentUser || !appReady || syncing) return;
+
+    clearTimeout(autoSyncTimer);
+
+    autoSyncTimer = setTimeout(() => {
+        syncToCloud();
+    }, 2000);
+}
+
+function installAutoSync() {
+    if (window.studySpaceAutoSyncInstalled) return;
+
+    const originalSetItem = Storage.prototype.setItem;
+    const originalRemoveItem = Storage.prototype.removeItem;
+
+    Storage.prototype.setItem = function(key, value) {
+        originalSetItem.call(this, key, value);
+
+        if (
+            this === localStorage &&
+            String(key).startsWith("studyspace_") &&
+            key !== GUEST_BACKUP_KEY
+        ) {
+            scheduleAutoSync();
+        }
+    };
+
+    Storage.prototype.removeItem = function(key) {
+        originalRemoveItem.call(this, key);
+
+        if (
+            this === localStorage &&
+            String(key).startsWith("studyspace_") &&
+            key !== GUEST_BACKUP_KEY
+        ) {
+            scheduleAutoSync();
+        }
+    };
+
+    window.studySpaceAutoSyncInstalled = true;
+}
