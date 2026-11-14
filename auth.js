@@ -18,6 +18,10 @@ let currentUser = null;
 let appReady = false;
 let syncing = false;
 
+let autoSyncTimer = null;
+let cloudSyncInProgress = false;
+let syncAgain = false;
+
 /* =========================================
    LOCAL DATA MANAGEMENT
 ========================================= */
@@ -88,47 +92,45 @@ function restoreGuestBackup() {
    CLOUD BACKUP
 ========================================= */
 
+
 async function syncToCloud() {
     if (!currentUser || !appReady) return;
 
-    const snapshot = getStudySpaceData();
+    if (cloudSyncInProgress) {
+        syncAgain = true;
+        return;
+    }
 
-    const { error } = await supabaseClient
-        .from("studyspace_data")
-        .upsert({
-            user_id: currentUser.id,
-            data: snapshot,
-            updated_at: new Date().toISOString()
-        });
+    cloudSyncInProgress = true;
 
-    if (error) {
+    try {
+        do {
+            syncAgain = false;
+
+            const snapshot = getStudySpaceData();
+
+            const { error } = await supabaseClient
+                .from("studyspace_data")
+                .upsert({
+                    user_id: currentUser.id,
+                    data: snapshot,
+                    updated_at: new Date().toISOString()
+                });
+
+            if (error) {
+                throw error;
+            }
+
+        } while (syncAgain);
+
+        showAuthMessage("Your StudySpace data is backed up!");
+
+    } catch (error) {
         console.error("Cloud sync failed:", error.message);
-        showAuthMessage("Sync failed: " + error.message);
-        return;
-    }
+        showAuthMessage("Cloud sync failed: " + error.message);
 
-    showAuthMessage("Your StudySpace data is backed up!");
-}
-
-async function loadCloudData(user) {
-    const { data, error } = await supabaseClient
-        .from("studyspace_data")
-        .select("data")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-    if (error) {
-        showAuthMessage("Could not load cloud data: " + error.message);
-        return;
-    }
-
-    if (data && data.data) {
-        saveGuestBackup();
-        restoreData(data.data);
-        showAuthMessage("Your cloud data has been restored.");
-    } else {
-        await syncToCloud();
-        showAuthMessage("Your account backup has been created.");
+    } finally {
+        cloudSyncInProgress = false;
     }
 }
 
@@ -473,10 +475,10 @@ async function startStudySpace() {
     // Load the existing dashboard only after cloud restoration.
     const script = document.createElement("script");
     script.src = "script.js";
-    script.onload = () => {
-        appReady = true;
-    };
-
+   script.onload = () => {
+    appReady = true;
+    installAutoSync();
+};
     document.body.appendChild(script);
 }
 
