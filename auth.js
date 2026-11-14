@@ -7,10 +7,10 @@ const SUPABASE_URL = "https://zwkdelxgbhrlhrukquns.supabase.co";
 
 const SUPABASE_KEY = "sb_publishable_4TIFdmLgWxN9T2YUSP-kwA_RcbQJK_I";
 
-const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
+const supabaseClient =
+    window.supabase && typeof window.supabase.createClient === "function"
+        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+        : null;
 
 const GUEST_BACKUP_KEY = "studyspace_auth_guest_backup_v1";
 
@@ -64,8 +64,10 @@ function restoreData(data) {
         .forEach(key => localStorage.removeItem(key));
 
     Object.entries(data || {}).forEach(([key, value]) => {
-        if (key.startsWith("studyspace_") &&
-            key !== GUEST_BACKUP_KEY) {
+        if (
+            key.startsWith("studyspace_") &&
+            key !== GUEST_BACKUP_KEY
+        ) {
             localStorage.setItem(key, value);
         }
     });
@@ -92,8 +94,14 @@ function restoreGuestBackup() {
    CLOUD BACKUP
 ========================================= */
 
-
 async function syncToCloud() {
+    if (!supabaseClient) {
+        showAuthMessage(
+            "Account service is unavailable. Guest mode is ready."
+        );
+        return;
+    }
+
     if (!currentUser || !appReady) return;
 
     if (cloudSyncInProgress) {
@@ -133,12 +141,23 @@ async function syncToCloud() {
         cloudSyncInProgress = false;
     }
 }
-async function loadCloudData(user) {
+
+async function loadCloudData(user, options = {}) {
+    if (!supabaseClient) {
+        throw new Error("Account service is unavailable.");
+    }
+
     const { data, error } = await supabaseClient
         .from("studyspace_data")
         .select("data")
         .eq("user_id", user.id)
         .maybeSingle();
+
+    // Ignore a late startup response after the startup restore has timed out.
+    // A later manual login can still restore cloud data normally.
+    if (options.startup && window.studySpaceSkipLateCloudRestore) {
+        return;
+    }
 
     if (error) {
         showAuthMessage("Could not load cloud data: " + error.message);
@@ -168,6 +187,7 @@ async function loadCloudData(user) {
 
     showAuthMessage("Your account backup has been created.");
 }
+
 /* =========================================
    AUTHENTICATION UI
 ========================================= */
@@ -279,9 +299,11 @@ function createAuthUI() {
             >
 
             <button id="studyspaceSubmitAuth">Continue</button>
+
             <button id="studyspaceResendEmail" class="secondary">
-    Resend Confirmation Email
-</button>
+                Resend Confirmation Email
+            </button>
+
             <button id="studyspaceCancelAuth" class="secondary">
                 Cancel
             </button>
@@ -312,8 +334,10 @@ function createAuthUI() {
 
     document.getElementById("studyspaceSubmitAuth")
         .addEventListener("click", submitAuth);
-document.getElementById("studyspaceResendEmail")
-    .addEventListener("click", resendConfirmationEmail);
+
+    document.getElementById("studyspaceResendEmail")
+        .addEventListener("click", resendConfirmationEmail);
+
     document.getElementById("studyspaceSyncButton")
         .addEventListener("click", syncToCloud);
 
@@ -343,6 +367,13 @@ function closeAuthForm() {
 ========================================= */
 
 async function submitAuth() {
+    if (!supabaseClient) {
+        showAuthMessage(
+            "Account service is unavailable. You can continue in guest mode."
+        );
+        return;
+    }
+
     const email = document.getElementById("studyspaceEmail").value.trim();
     const password = document.getElementById("studyspacePassword").value;
 
@@ -386,7 +417,8 @@ async function submitAuth() {
             );
             return;
         }
-saveGuestBackup();
+
+        saveGuestBackup();
         currentUser = result.data.user;
 
         await loadCloudData(currentUser);
@@ -411,6 +443,13 @@ saveGuestBackup();
 ========================================= */
 
 async function logoutUser() {
+    if (!supabaseClient) {
+        showAuthMessage(
+            "Account service is unavailable. You are still using guest mode."
+        );
+        return;
+    }
+
     if (!currentUser) return;
 
     const confirmed = confirm(
@@ -488,37 +527,108 @@ function escapeAuthText(value) {
    STARTUP
 ========================================= */
 
+function withTimeout(promise, milliseconds, message) {
+    let timeoutId;
+
+    const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => {
+            reject(new Error(message));
+        }, milliseconds);
+    });
+
+    return Promise.race([promise, timeoutPromise]).finally(() => {
+        clearTimeout(timeoutId);
+    });
+}
+
+function loadStudySpaceDashboard() {
+    if (window.studySpaceDashboardStarted) return;
+
+    window.studySpaceDashboardStarted = true;
+
+    const script = document.createElement("script");
+    script.src = "script.js";
+
+    script.onload = () => {
+        appReady = true;
+        installAutoSync();
+    };
+
+    script.onerror = () => {
+        window.studySpaceDashboardStarted = false;
+
+        showAuthMessage(
+            "StudySpace could not load its dashboard script. Please refresh the page."
+        );
+    };
+
+    document.body.appendChild(script);
+}
+
 async function startStudySpace() {
     createAuthUI();
 
+    // Keep the dashboard usable even if the Supabase service is unavailable.
+    if (!supabaseClient) {
+        showAuthMessage(
+            "Account service is unavailable. StudySpace is opening in guest mode."
+        );
+
+        updateAuthStatus();
+        loadStudySpaceDashboard();
+        return;
+    }
+
     try {
-        const { data, error } = await supabaseClient.auth.getSession();
+        const sessionResult = await withTimeout(
+            supabaseClient.auth.getSession(),
+            8000,
+            "Account check timed out."
+        );
+
+        const { data, error } = sessionResult;
 
         if (error) {
-            showAuthMessage(error.message);
+            showAuthMessage(
+                "Account connection unavailable. Guest mode is ready."
+            );
         } else if (data.session) {
             currentUser = data.session.user;
-            await loadCloudData(currentUser);
+
+            await withTimeout(
+                loadCloudData(currentUser, { startup: true }),
+                8000,
+                "Cloud restore timed out."
+            );
         }
+
     } catch (error) {
-        showAuthMessage("Account connection unavailable. Guest mode is ready.");
+        currentUser = null;
+        window.studySpaceSkipLateCloudRestore = true;
+
+        showAuthMessage(
+            "Account connection is taking too long. StudySpace is opening in guest mode."
+        );
     }
 
     updateAuthStatus();
-
-    // Load the existing dashboard only after cloud restoration.
-    const script = document.createElement("script");
-    script.src = "script.js";
-   script.onload = () => {
-    appReady = true;
-    installAutoSync();
-};
-    document.body.appendChild(script);
+    loadStudySpaceDashboard();
 }
 
 startStudySpace();
 
+/* =========================================
+   RESEND CONFIRMATION EMAIL
+========================================= */
+
 async function resendConfirmationEmail() {
+    if (!supabaseClient) {
+        showAuthMessage(
+            "Account service is unavailable. You can continue in guest mode."
+        );
+        return;
+    }
+
     const email = document
         .getElementById("studyspaceEmail")
         .value.trim();
@@ -546,6 +656,10 @@ async function resendConfirmationEmail() {
         "A fresh confirmation email has been requested. Check your inbox."
     );
 }
+
+/* =========================================
+   AUTOMATIC CLOUD SYNC
+========================================= */
 
 function scheduleAutoSync() {
     if (!currentUser || !appReady || syncing) return;
@@ -629,6 +743,10 @@ function setupFeedbackForm() {
         status.textContent = "";
 
         try {
+            if (!supabaseClient) {
+                throw new Error("Feedback service is currently unavailable.");
+            }
+
             const { error } = await supabaseClient
                 .from("studyspace_feedback")
                 .insert({
@@ -644,12 +762,13 @@ function setupFeedbackForm() {
                 "Thank you! Your feedback was submitted successfully.";
 
             form.reset();
-} catch (error) {
-    console.error("Feedback submission failed:", error);
 
-    status.textContent =
-        "Could not submit feedback. Please try again.";
-}
+        } catch (error) {
+            console.error("Feedback submission failed:", error);
+
+            status.textContent =
+                "Could not submit feedback. Please try again.";
+
         } finally {
             button.disabled = false;
             button.textContent = "Submit Feedback";
